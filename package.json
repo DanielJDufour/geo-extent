@@ -1,0 +1,44 @@
+{
+  "name": "geo-extent",
+  "version": "0.0.0",
+  "description": "Simple, Modern Geospatial Bounding Boxes",
+  "main": "geo-extent.js",
+  "type": "module",
+  "scripts": {
+    "format": "npx prettier --arrow-parens=avoid --print-width=120 --trailing-comma=none --write *.js",
+    "test": "node test.mjs",
+    "test:html": "npx snowpack dev --polyfill-node"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DanielJDufour/geo-extent.git"
+  },
+  "keywords": [
+    "bbox",
+    "bounding",
+    "epsg",
+    "extent",
+    "geo",
+    "geospatial",
+    "gis",
+    "leaflet",
+    "maps",
+    "projection",
+    "proj4",
+    "proj4js",
+    "reprojection"
+  ],
+  "author": "Daniel J. Dufour",
+  "license": "CC0-1.0",
+  "bugs": {
+    "url": "https://github.com/DanielJDufour/geo-extent/issues"
+  },
+  "homepage": "https://github.com/DanielJDufour/geo-extent#readme",
+  "devDependencies": {
+    "flug": "^2.1.0"
+  },
+  "dependencies": {
+    "get-epsg-code": "^0.0.5",
+    "reproject-bbox": "^0.0.3"
+  }
+}
