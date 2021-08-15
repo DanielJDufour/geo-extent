@@ -40,3 +40,16 @@ map.fitBounds(bounds);
 // srs: 4326 indicates the 4326 projection that uses Latitude/Longitude
 const extent = new GeoExtent(bounds, { srs: 4326 });
 ```
+
+## Creating from LeafletJS LatLngBounds Object
+[LeafletJS](https://leafletjs.com/) also allows you to create a [LatLngBounds](https://leafletjs.com/reference-1.7.1.html#latlngbounds) object which provides additional functionality like padding the bounds.  You can also create a GeoExtent from this object as well.
+```js
+// bounds as a LatLngBounds object
+const latLngBounds = new L.LatLngBounds(southWest, northEast);
+
+// assumes EPSG:4326
+const extent = new GeoExtent(latLngBounds);
+
+// if for some reason, you want to hack/override the default srs "EPSG:4326" for LatLngBounds objects
+const extent = new GeoExtent(latLngBounds, { srs: "urn:ogc:def:crs:EPSG::4326" });
+```
