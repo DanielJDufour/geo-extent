@@ -1,6 +1,12 @@
 # geo-extent
 > Simple, Modern Geospatial Bounding Boxes
 
+# features
+- immutable: all functions return a new GeoExtent
+- chainable: ex: `extent.reproj(3857).crop(other).toGeoJSON()`
+- universal input: works with bbox arrays, xy corner points, and Leaflet bounds
+- interoperability: integrates well with Leaflet, OpenLayers, and ESRI
+
 # install
 ```bash
 npm install geo-extent
@@ -25,10 +31,8 @@ const partial = tile.crop(cog);
 // partial is equivalent to GeoExtent([-10605790.548624776, 3358990.12945602, -10601914.152717294, 3365675.2294528796], 3857);
 ```
 
-# features
-- immutable: all functions return a new tile
-- chainable: ex: `extent.reproj(3857).crop(other).toGeoJSON()`
-- universal input: works with bbox arrays, xy corner points, and Leaflet bounds
+# documentation
+For more functions and examples, please consult the documentation at https://github.com/DanielJDufour/geo-extent/tree/main/docs
 
 # used by 
 - [GeoRasterLayer for Leaflet](https://github.com/GeoTIFF/georaster-layer-for-leaflet)
