@@ -53,3 +53,43 @@ const extent = new GeoExtent(latLngBounds);
 // if for some reason, you want to hack/override the default srs "EPSG:4326" for LatLngBounds objects
 const extent = new GeoExtent(latLngBounds, { srs: "urn:ogc:def:crs:EPSG::4326" });
 ```
+
+## Creating from a GeoJSON BBox
+The [GeoJSON] spec allows you to specify a bounding box for your feature.  When this property is available, you may create a GeoExtent from this GeoJSON.
+```js
+const geojson = {
+    bbox: [-180, -90, 180, 90] // global bbox
+    properties: { ... }
+    geometry: {
+        type: "Polygon",
+        coordinates: [ ... ]
+    }
+};
+
+const extent = new GeoExtent(geojson, { srs: 4326 });
+```
+
+## Creating from a Point
+Philosophically speaking, points are really just extents with zero width and height, so you can create an extent from a point if you wish.
+GeoExtent works with points from [LeaflefJS](https://leafletjs.com/reference-1.7.1.html#point) and [OpenLayers](https://openlayers.org/en/latest/apidoc/module-ol_geom_Point-Point.html).  You can also pass in a point in the forms `[x, y]`, `[longitude, latitude]`, and `{ x, y }`;
+```js
+// decimal degrees for Washington, D.C.
+const longitude = -77.0147;
+const latitude = 38.9101;
+
+// points as [x, y] or [longitude, latitude] array
+new GeoExtent([longitude, latitude], { srs: 4326 });
+
+// point as { x, y } object
+new GeoExtent({ x: longitude, y: latitude }, { srs: 4326 });
+
+// LeafletJS Point
+import * as L from 'leaflet';
+const pointFromLeaflet = L.point(longitude, latitude);
+new GeoExtent(pointFromLeaflet, { srs: 4326 });
+
+// OpenLayers Point
+import Point from 'ol/geom/Point';
+const pointFromOpenLayers = new Point([longitude, latitude);
+new GeoExtent(pointFromOpenLayers, { srs: 4326 } )
+```
