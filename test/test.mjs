@@ -1,12 +1,12 @@
 import test from "flug";
-import { GeoExtent } from "./geo-extent.js";
+import { GeoExtent } from "../geo-extent.js";
 
 const XMIN = -72;
 const XMAX = 21;
 const YMIN = -47;
 const YMAX = 74;
 const BBOX = [XMIN, YMIN, XMAX, YMAX];
-const CENTER = [(XMIN + XMAX) / 2, (YMIN + YMAX) / 2];
+const CENTER = { x: (XMIN + XMAX) / 2, y: (YMIN + YMAX) / 2 };
 const WIDTH = XMAX - XMIN;
 const HEIGHT = YMAX - YMIN;
 const AREA = WIDTH * HEIGHT;
@@ -28,6 +28,10 @@ const AS_OBJ_RESULT = {
   ymax: YMAX,
   width: WIDTH,
   height: HEIGHT,
+  bottomLeft: { x: XMIN, y: YMIN },
+  bottomRight: { x: XMAX, y: YMIN },
+  topLeft: { x: XMIN, y: YMAX },
+  topRight: { x : XMAX, y: YMAX },
   str: BBOX.join(",")
 };
 
@@ -40,6 +44,28 @@ test("create from bbox in 4326", ({ eq }) => {
   eq(bbox.ymax, YMAX);
   eq(bbox.width, WIDTH);
   eq(bbox.height, HEIGHT);
+});
+
+test("create from points", ({ eq }) => {
+  const EXPECTED_EXTENT_FOR_PT = {
+    srs: 'EPSG:4326',
+    xmin: 147,
+    ymin: -18,
+    xmax: 147,
+    ymax: -18,
+    width: 0,
+    height: 0,
+    bottomLeft: { x: 147, y: -18 },
+    bottomRight: { x: 147, y: -18 },
+    topLeft: { x: 147, y: -18 },
+    topRight: { x: 147, y: -18 },
+    area: 0,
+    bbox: [ 147, -18, 147, -18 ],
+    center: { x: 147, y: -18 },
+    str: '147,-18,147,-18'
+  };
+  eq(new GeoExtent({ x: 147, y: -18 }, 4326).asObj(), EXPECTED_EXTENT_FOR_PT);
+  eq(new GeoExtent([ 147, -18 ], 4326).asObj(), EXPECTED_EXTENT_FOR_PT);
 });
 
 test("reproject from 4326 to 3857", ({ eq }) => {
@@ -133,3 +159,19 @@ test("cropping web mercator tile", ({ eq }) => {
 
   eq(partial.bbox, [-10605790.548624776, 3358990.12945602, -10601914.152717294, 3365675.2294528796]);
 });
+
+test("equals", ({ eq }) => {
+  const bbox = [-10605790.548624776, 3355891.2898323783, -10596006.609004272, 3365675.2294528796]
+  const original = new GeoExtent(bbox, 3857);
+  const via4326 = original.reproj(4326).reproj(3857);
+  eq(original.equals(via4326), true);
+
+  // reprojection shift
+  const via32615 = original.reproj(32615).reproj(3857);
+  eq(original.equals(via32615), false);
+
+  const similar = new GeoExtent([-10605790.5486247, 3355891.289832378, -10596006.60900427, 3365675.229452879], 3857);
+  eq(original.equals(similar, { digits: 4 }), true);
+  eq(original.equals(similar, { digits: 20 }), false);
+});
+

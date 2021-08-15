@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "format": "npx prettier --arrow-parens=avoid --print-width=120 --trailing-comma=none --write *.js",
-    "test": "node test.mjs",
+    "test": "for f in ./test/*; do node $f; done",
     "test:html": "npx snowpack dev --polyfill-node"
   },
   "repository": {
