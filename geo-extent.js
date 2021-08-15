@@ -58,7 +58,7 @@ const getConstructor = o => (typeof obj === "object" && typeof obj.constructor =
 // }
 
 export class GeoExtent {
-  constructor(o, srs) {
+  constructor(o, { srs } = {}) {
     if (isNum(srs)) {
       this.srs = "EPSG:" + srs;
     } else if (isStr(srs) && srs.startsWith("EPSG:")) {
@@ -195,7 +195,7 @@ export class GeoExtent {
       const ymin = Math.max(this.ymin, another.ymin);
       const xmax = Math.min(this.xmax, another.xmax);
       const ymax = Math.min(this.ymax, another.ymax);
-      return new this.constructor([xmin, ymin, xmax, ymax], this.srs);
+      return new this.constructor([xmin, ymin, xmax, ymax], { srs: this.srs });
     }
 
     // fall back to converting everything to 4326 and cropping there
@@ -206,7 +206,7 @@ export class GeoExtent {
     const minLat = Math.max(aMinLat, bMinLat);
     const maxLon = Math.min(aMaxLon, bMaxLon);
     const maxLat = Math.min(aMaxLat, bMaxLat);
-    return new this.constructor([minLon, minLat, maxLon, maxLat], 4326).reproj(this.srs);
+    return new this.constructor([minLon, minLat, maxLon, maxLat], { srs: 4326 }).reproj(this.srs);
   }
 
   // add two extents together
@@ -268,7 +268,7 @@ export class GeoExtent {
       if (quiet) return;
       throw new Error(`[geo-extent] failed to reproject ${this.bbox} from ${this.srs} to ${to}`);
     }
-    return new GeoExtent(reprojected, to);
+    return new GeoExtent(reprojected, { srs: to });
   }
 
   asEsriJSON() {

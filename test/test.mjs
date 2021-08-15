@@ -37,7 +37,7 @@ const AS_OBJ_RESULT = {
 
 
 test("create from bbox in 4326", ({ eq }) => {
-  const bbox = new GeoExtent(BBOX, 4326);
+  const bbox = new GeoExtent(BBOX, { srs: 4326 });
   eq(bbox.xmin, XMIN);
   eq(bbox.xmax, XMAX);
   eq(bbox.ymin, YMIN);
@@ -64,12 +64,12 @@ test("create from points", ({ eq }) => {
     center: { x: 147, y: -18 },
     str: '147,-18,147,-18'
   };
-  eq(new GeoExtent({ x: 147, y: -18 }, 4326).asObj(), EXPECTED_EXTENT_FOR_PT);
-  eq(new GeoExtent([ 147, -18 ], 4326).asObj(), EXPECTED_EXTENT_FOR_PT);
+  eq(new GeoExtent({ x: 147, y: -18 }, { srs: 4326 }).asObj(), EXPECTED_EXTENT_FOR_PT);
+  eq(new GeoExtent([ 147, -18 ], { srs: 4326 }).asObj(), EXPECTED_EXTENT_FOR_PT);
 });
 
 test("reproject from 4326 to 3857", ({ eq }) => {
-  const bbox = new GeoExtent(BBOX, 4326);
+  const bbox = new GeoExtent(BBOX, { srs: 4326 });
   const extentIn3857 = bbox.reproj(3857);
   eq(extentIn3857.srs, 'EPSG:3857');
   eq(extentIn3857.bbox, [
@@ -81,12 +81,12 @@ test("reproject from 4326 to 3857", ({ eq }) => {
 });
 
 test("intake Bounds Array", ({ eq }) => {
-  const bbox = new GeoExtent(TWO_CORNER_BOUNDS, 4326);
+  const bbox = new GeoExtent(TWO_CORNER_BOUNDS, { srs: 4326 });
   eq(bbox.asObj(), AS_OBJ_RESULT);
 });
 
 test("intake two xy points", ({ eq }) => {
-  const bbox = new GeoExtent([{ x: XMIN, y: YMIN }, { x: XMAX, y: YMAX }], 4326);
+  const bbox = new GeoExtent([{ x: XMIN, y: YMIN }, { x: XMAX, y: YMAX }], { srs: 4326 });
   eq(bbox.asObj(), AS_OBJ_RESULT);
 })
 
@@ -111,12 +111,12 @@ test("reproj error", ({ eq }) => {
 });
 
 test("crop", ({ eq }) => {
-  const northernHemisphere = new GeoExtent(NORTHERN_HEMISPHERE, 4326);
-  const northWestQuarterSphere = new GeoExtent(NORTH_WEST_QUARTER_SPHERE, 4326);
+  const northernHemisphere = new GeoExtent(NORTHERN_HEMISPHERE, { srs: 4326 });
+  const northWestQuarterSphere = new GeoExtent(NORTH_WEST_QUARTER_SPHERE, { srs: 4326 });
   eq(northernHemisphere.crop(WESTERN_HEMISPHERE).bbox, NORTH_WEST_QUARTER_SPHERE);
 
   // northern part
-  const result = new GeoExtent([-180, -85, 180, 85], 4326).reproj(3857).crop(northWestQuarterSphere).reproj(4326);
+  const result = new GeoExtent([-180, -85, 180, 85], { srs: 4326 }).reproj(3857).crop(northWestQuarterSphere).reproj(4326);
   eq(result.bbox[0] - -180 < 0.000001, true);
   eq(result.bbox[1] - 0 < 0.000001, true);
   eq(result.bbox[2] - 0 < 0.000001, true);
@@ -124,35 +124,35 @@ test("crop", ({ eq }) => {
 });
 
 test("contains", ({ eq }) => {
-  const area = new GeoExtent([-1252344.2714243277, -7.081154551613622e-10, 0, 1252344.2714243277], 3857);
-  const globe = new GeoExtent([-180, -89.99928, 179.99856, 90], 4326);
+  const area = new GeoExtent([-1252344.2714243277, -7.081154551613622e-10, 0, 1252344.2714243277], { srs: 3857 });
+  const globe = new GeoExtent([-180, -89.99928, 179.99856, 90], { srs: 4326 });
   const result = globe.contains(area);
   eq(result, true);
 });
 
 test("cropping area in web mercator by globe", ({ eq }) => {
-  const area = new GeoExtent([-1252344.2714243277, -7.081154551613622e-10, 0, 1252344.2714243277], 3857);
-  const cut = new GeoExtent([-180, -89.99928, 179.99856, 90], 4326);
+  const area = new GeoExtent([-1252344.2714243277, -7.081154551613622e-10, 0, 1252344.2714243277], { srs: 3857 });
+  const cut = new GeoExtent([-180, -89.99928, 179.99856, 90], { srs: 4326 });
   const cropped = area.crop(cut);
   eq(area.asObj(), cropped.asObj());
 });
 
 test("cropping global by web mercator globe", ({ eq }) => {
-  const a = new GeoExtent([-20037508.342789244, -20037508.342789255, 20037508.342789244, 20037508.342789244], 3857);
-  const b = new GeoExtent([-180, -89.99928, 179.99856, 90], 4326);
+  const a = new GeoExtent([-20037508.342789244, -20037508.342789255, 20037508.342789244, 20037508.342789244], { srs: 3857 });
+  const b = new GeoExtent([-180, -89.99928, 179.99856, 90], { srs: 4326 });
   const res = a.crop(b);
   eq(res.bbox, [-20037508.342789244, -20037508.342789255, 20037348.0427225, 20037508.342789244]);
 });
 
 test("cropping web mercator tile", ({ eq }) => {
   // web mercator tile x: 964, y: 1704, z: 12
-  const tile = new GeoExtent([-10605790.548624776, 3355891.2898323783, -10596006.609004272, 3365675.2294528796], 3857);
+  const tile = new GeoExtent([-10605790.548624776, 3355891.2898323783, -10596006.609004272, 3365675.2294528796], { srs: 3857 });
 
   // convert web mercator tile to Latitude/Longitude
   eq(tile.reproj(4326).bbox, [-95.27343750000001, 28.84467368077178, -95.185546875, 28.921631282421277]);
 
   // extent of Cloud-Optimized GeoTIFF in UTM Projection 32615
-  const cog = new GeoExtent([259537.6, 3195976.8000000003, 281663.2, 3217617.6], 32615);
+  const cog = new GeoExtent([259537.6, 3195976.8000000003, 281663.2, 3217617.6], { srs: 32615 });
 
   const partial = tile.crop(cog);
   // partial is GeoExtent([-10605790.548624776, 3358990.12945602, -10601914.152717294, 3365675.2294528796], 3857);
@@ -162,7 +162,7 @@ test("cropping web mercator tile", ({ eq }) => {
 
 test("equals", ({ eq }) => {
   const bbox = [-10605790.548624776, 3355891.2898323783, -10596006.609004272, 3365675.2294528796]
-  const original = new GeoExtent(bbox, 3857);
+  const original = new GeoExtent(bbox, { srs: 3857 });
   const via4326 = original.reproj(4326).reproj(3857);
   eq(original.equals(via4326), true);
 
@@ -170,7 +170,7 @@ test("equals", ({ eq }) => {
   const via32615 = original.reproj(32615).reproj(3857);
   eq(original.equals(via32615), false);
 
-  const similar = new GeoExtent([-10605790.5486247, 3355891.289832378, -10596006.60900427, 3365675.229452879], 3857);
+  const similar = new GeoExtent([-10605790.5486247, 3355891.289832378, -10596006.60900427, 3365675.229452879], { srs: 3857 });
   eq(original.equals(similar, { digits: 4 }), true);
   eq(original.equals(similar, { digits: 20 }), false);
 });
