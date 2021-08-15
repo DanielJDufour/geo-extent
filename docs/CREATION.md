@@ -14,5 +14,29 @@ see the example below:
 # creating a GeoExtent from a bbox array
 import { GeoExtent } from 'geo-extent';
 
-const extent = new GeoExtent([-180, 0, 180, 90], { srs: 4326 });
+const bbox = [-180, 0, 180, 90];
+const extent = new GeoExtent(bbox, { srs: 4326 });
+```
+
+## Creating from LeafletJS Bounds Array
+[LeafletJS](https://leafletjs.com/) will sometimes represent bounds as an array of two corner points, the southest and northeast.
+You can create extent from these points as the following shows:
+```js
+
+const minLongitude = -36.227;
+const minLatitude = -20.712;
+const southWest = [minLatitude, minLongitude];
+
+const maxLongitude = 74.125;
+const maxLatitude = 40.774;
+const northEast = [maxLatitude, maxLongitude];
+
+const bounds = [southWest, northEast];
+
+// fits the LeafletJS map to the bounds
+map.fitBounds(bounds);
+
+// create a GeoExtent from the bounds
+// srs: 4326 indicates the 4326 projection that uses Latitude/Longitude
+const extent = new GeoExtent(bounds, { srs: 4326 });
 ```
