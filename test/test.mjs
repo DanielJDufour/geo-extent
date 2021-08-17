@@ -34,6 +34,7 @@ const AS_OBJ_RESULT = {
   topRight: { x : XMAX, y: YMAX },
   str: BBOX.join(",")
 };
+// console.log(AS_OBJ_RESULT);
 
 
 test("create from bbox in 4326", ({ eq }) => {
