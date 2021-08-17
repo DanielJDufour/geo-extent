@@ -1,5 +1,6 @@
 # Function: Crop
-Each GeoExtent has a crop function which allows you to make sure an extent doesn't exceed the boundaries of another extent.  In other words, if c is the extent of a county and t is the extent of a mercator tile, then `c.crop(t)` would return the extent of the county that falls within the tile.
+Each GeoExtent has a crop function which allows you to make sure an extent doesn't exceed the boundaries of another extent.  In other words, if `c` is the extent of a county and `t` is the extent of a mercator tile, then `c.crop(t)` would return the extent of the county that falls within the tile.
+If `c` and `t` don't share the same [srs](https://en.wikipedia.org/wiki/Spatial_reference_system), then GeoExtent will automatically and internally [clone](https://github.com/DanielJDufour/geo-extent/blob/main/docs/functions/clone.md) `t` and [reproject](https://github.com/DanielJDufour/geo-extent/blob/main/docs/functions/reproj.md) the clone to the srs of `c` before cropping with it.
 
 ```js
 import { GeoExtent } from 'geo-extent';
@@ -19,7 +20,7 @@ that falls within the tile (for the north-eastern part of the globe)
 GeoExtent {
   srs: 'EPSG:4326',
   xmin: 34.4282,
-  ymin: 0, // cropping change ymin from -4.2367 to 0
+  ymin: 0, // cropping changed ymin from -4.2367 to 0
   xmax: 41.3861,
   ymax: 4.4296,
   width: 6.957900000000002,
