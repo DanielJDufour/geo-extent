@@ -101,15 +101,6 @@ test("overlaps", ({ eq }) => {
   eq(northPole.overlaps(southPole), false);
 });
 
-test("reproj error", ({ eq }) => {
-  let msg;
-  try {
-    new GeoExtent([-180, -85, 180, 85]).reproj(3857)
-  } catch (error) {
-    msg = error.message;
-  }
-  eq(msg.includes("cannot reproject"), true);
-});
 
 test("crop", ({ eq }) => {
   const northernHemisphere = new GeoExtent(NORTHERN_HEMISPHERE, { srs: 4326 });
@@ -122,13 +113,6 @@ test("crop", ({ eq }) => {
   eq(result.bbox[1] - 0 < 0.000001, true);
   eq(result.bbox[2] - 0 < 0.000001, true);
   eq(result.bbox[3] - 85 < 0.000001, true);
-});
-
-test("contains", ({ eq }) => {
-  const area = new GeoExtent([-1252344.2714243277, -7.081154551613622e-10, 0, 1252344.2714243277], { srs: 3857 });
-  const globe = new GeoExtent([-180, -89.99928, 179.99856, 90], { srs: 4326 });
-  const result = globe.contains(area);
-  eq(result, true);
 });
 
 test("cropping area in web mercator by globe", ({ eq }) => {
@@ -161,18 +145,5 @@ test("cropping web mercator tile", ({ eq }) => {
   eq(partial.bbox, [-10605790.548624776, 3358990.12945602, -10601914.152717294, 3365675.2294528796]);
 });
 
-test("equals", ({ eq }) => {
-  const bbox = [-10605790.548624776, 3355891.2898323783, -10596006.609004272, 3365675.2294528796]
-  const original = new GeoExtent(bbox, { srs: 3857 });
-  const via4326 = original.reproj(4326).reproj(3857);
-  eq(original.equals(via4326), true);
 
-  // reprojection shift
-  const via32615 = original.reproj(32615).reproj(3857);
-  eq(original.equals(via32615), false);
-
-  const similar = new GeoExtent([-10605790.5486247, 3355891.289832378, -10596006.60900427, 3365675.229452879], { srs: 3857 });
-  eq(original.equals(similar, { digits: 4 }), true);
-  eq(original.equals(similar, { digits: 20 }), false);
-});
 
