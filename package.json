@@ -4,6 +4,9 @@
   "description": "Simple, Modern Geospatial Bounding Boxes",
   "main": "geo-extent.js",
   "type": "module",
+  "files": [
+    "geo-extent.js"
+  ],
   "scripts": {
     "format": "npx prettier --arrow-parens=avoid --print-width=120 --trailing-comma=none --write *.js test/*.js",
     "test": "for f in ./test/*; do node $f; done",
