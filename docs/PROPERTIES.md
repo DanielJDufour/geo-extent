@@ -18,4 +18,4 @@ Once you've created a GeoExtent, you will have access to the following propertie
 | topLeft | { x: -72, y: 74 } | The top-left corner of the extent |
 | topRight | { x: 21, y: 74 } | The top-right corner of the extent |
 | str | '-72,-47,21,74' | A string representation of the GeoExtent's bbox. Helpful for passing as a parameter to API Services. |
-| leafletBounds | [ [-47, -72], [74, 21] ] | An array of two corners in form accepted by LeafletJS, which is [ [ymin, xmin], [ymax, xmax] ] |
+| leafletBounds | [<br/>&nbsp;&nbsp;[-47, -72],<br/>&nbsp;&nbsp;[74, 21]<br/>] | An array of two corners in form accepted by LeafletJS, which is [ [ymin, xmin], [ymax, xmax] ] |
