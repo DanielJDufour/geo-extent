@@ -38,7 +38,10 @@
   },
   "homepage": "https://github.com/DanielJDufour/geo-extent#readme",
   "devDependencies": {
-    "flug": "^2.1.0"
+    "flug": "^2.1.0",
+    "global-jsdom": "^8.1.0",
+    "jsdom": "^17.0.0",
+    "leaflet": "^1.7.1"
   },
   "dependencies": {
     "get-epsg-code": "^0.0.5",

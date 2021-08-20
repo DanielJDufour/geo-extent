@@ -1,6 +1,7 @@
 # Function: equals
 You can test if two extents are equivalent using the equals function.  If the extents use different [spatial reference systems](https://en.wikipedia.org/wiki/Spatial_reference_system), the
 equals will reproject the second extent internally before making the comparison.
+If other is not an instance of GeoExtent, it will try to convert it to a GeoExtent before making the comparison.
 
 # basic usage
 ```js

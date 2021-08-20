@@ -24,8 +24,11 @@ const isFunc = o => typeof o === "function";
 const isObj = o => typeof o === "object";
 const isStr = o => typeof o === "string";
 const isNum = o => typeof o === "number";
+const isLeafletLatLngBounds = o => isObj(o) && hasFuncs(o, ["getEast", "getNorth", "getSouth", "getWest"]);
 const hasFunc = (o, f) => isObj(o) && isFunc(o[f]);
+const hasObj = (o, k) => isObj(o) && isObj(o[k]);
 const hasFuncs = (o, fs) => fs.every(f => hasFunc(o, f));
+const hasObjs = (o, ks) => ks.every(k => hasObj(o, k));
 const hasKey = (o, k) => isObj(o) && o[k] !== undefined && o[k] !== null;
 const hasKeys = (o, ks) => ks.every(k => hasKey(o, k));
 const allNums = ary => isAry(ary) && ary.every(isNum);
@@ -78,7 +81,7 @@ export class GeoExtent {
       [xmin, ymin, xmax, ymax] = o;
     } else if (isAry(o) && o.length === 2 && o.every(isAry) && o.every(o => o.length === 2 && allNums(o))) {
       [[ymin, xmin], [ymax, xmax]] = o;
-    } else if (isObj(o) && hasFuncs(o, ["getEast", "getNorth", "getSouth", "getWest"])) {
+    } else if (isLeafletLatLngBounds(o)) {
       (xmin = o.getWest()), (xmax = o.getEast()), (ymin = o.getSouth()), (ymax = o.getNorth());
       if (!this.srs) this.srs = "EPSG:4326";
     } else if (isAry(o) && o.length === 2 && o.every(it => hasKeys(it, ["x", "y"]))) {
@@ -123,6 +126,16 @@ export class GeoExtent {
       // like GeoJSON with bbox property set
       // { type: "Feature", "bbox": [-37, 7, 12, 67 ], "geometry": { "type": "Polygon", "coordinates": [...] } }
       [xmin, ymin, xmax, ymax] = o.bbox;
+    } else if (hasObj(o, "_bounds") && isLeafletLatLngBounds(o._bounds)) {
+      const { _bounds } = o;
+      (xmin = _bounds.getWest()), (xmax = _bounds.getEast()), (ymin = _bounds.getSouth()), (ymax = _bounds.getNorth());
+      if (!this.srs) this.srs = "EPSG:4326";
+    } else if (isObj(o) && isObj(o._bounds) && hasObjs(o._bounds, ["_southWest", "_northEast"])) {
+      ({ lat: ymin, lng: xmin } = o._bounds._southWest);
+      ({ lat: ymax, lng: xmax } = o._bounds._northEast);
+      if (!isDef(this.srs)) this.srs = "EPSG:4326";
+    } else {
+      throw new Error("[geo-extent] unknown format");
     }
 
     this.xmin = xmin;
@@ -230,6 +243,9 @@ export class GeoExtent {
   }
 
   equals(other, { digits = 13, strict = true } = { digits: 13, strict: true }) {
+    // convert other to GeoExtent if necessary
+    other = new this.constructor(other);
+
     if (isDef(this.srs) && isDef(other.srs)) {
       other = other.reproj(this.srs);
     } else if (strict && isDef(this.srs) !== !isDef(this.srs)) {
