@@ -138,6 +138,11 @@ export class GeoExtent {
     this.topLeft = { x: xmin, y: ymax };
     this.topRight = { x: xmax, y: ymax };
 
+    this.leafletBounds = [
+      [this.ymin, this.xmin],
+      [this.ymax, this.xmax]
+    ];
+
     this.area = this.width * this.height;
     this.bbox = [xmin, ymin, xmax, ymax];
     this.center = { x: avg(xmin, xmax), y: avg(ymin, ymax) };

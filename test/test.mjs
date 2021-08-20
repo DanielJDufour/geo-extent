@@ -32,7 +32,11 @@ const AS_OBJ_RESULT = {
   bottomRight: { x: XMAX, y: YMIN },
   topLeft: { x: XMIN, y: YMAX },
   topRight: { x : XMAX, y: YMAX },
-  str: BBOX.join(",")
+  str: BBOX.join(","),
+  leafletBounds: [
+    [YMIN, XMIN],
+    [YMAX, XMAX]
+  ]
 };
 // console.log(AS_OBJ_RESULT);
 
@@ -63,7 +67,11 @@ test("create from points", ({ eq }) => {
     area: 0,
     bbox: [ 147, -18, 147, -18 ],
     center: { x: 147, y: -18 },
-    str: '147,-18,147,-18'
+    str: '147,-18,147,-18',
+    leafletBounds: [
+      [ -18, 147 ],
+      [ -18, 147 ]
+    ]
   };
   eq(new GeoExtent({ x: 147, y: -18 }, { srs: 4326 }).asObj(), EXPECTED_EXTENT_FOR_PT);
   eq(new GeoExtent([ 147, -18 ], { srs: 4326 }).asObj(), EXPECTED_EXTENT_FOR_PT);
