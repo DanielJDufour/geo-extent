@@ -12,6 +12,7 @@ Once you've created a GeoExtent, you will have access to the following propertie
 | height | 121 | The height of the extent in units of the [srs](https://en.wikipedia.org/wiki/Spatial_reference_system).  This is often either degrees latitude or meters. |
 | width | 93 | The width of the extent in units of the [srs](https://en.wikipedia.org/wiki/Spatial_reference_system).  This is often either degrees longitude or meters. |
 | area | 11253 | The area of the extent in units of the [srs](https://en.wikipedia.org/wiki/Spatial_reference_system). This is often in degrees or meters squared. Because this uses the units of the srs, this is just an approximation and can't be relied upon as the "true" area. |
+| perimeter | 428 | The perimeter of the extent in units of the [srs](https://en.wikipedia.org/wiki/Spatial_reference_system). This is often in degrees or meters. Because this uses the units of the srs, this is just an approximation and can't be relied upon as the "true" perimeter.
 | center | { x: -25.5, y: 13.5 } | The center of the extent or half-way point along the x and y directions. |
 | bottomLeft | { x: -72, y: -47 } | The bottom-left corner of the extent |
 | bottomRight | { x: 21, y: -47 } | The bottom-right corner of the extent |

@@ -20,6 +20,7 @@ const NORTH_WEST_QUARTER_SPHERE = [-180, 0, 0, 90];
 const AS_OBJ_RESULT = {
   srs: 'EPSG:4326',
   area: AREA,
+  perimeter: 2 * WIDTH + 2 * HEIGHT,
   bbox: BBOX,
   center: CENTER,
   xmin: XMIN,
@@ -65,6 +66,7 @@ test("create from points", ({ eq }) => {
     topLeft: { x: 147, y: -18 },
     topRight: { x: 147, y: -18 },
     area: 0,
+    perimeter: 0,
     bbox: [ 147, -18, 147, -18 ],
     center: { x: 147, y: -18 },
     str: '147,-18,147,-18',

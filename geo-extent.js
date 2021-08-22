@@ -157,6 +157,7 @@ export class GeoExtent {
     ];
 
     this.area = this.width * this.height;
+    this.perimeter = 2 * this.width + 2 * this.height;
     this.bbox = [xmin, ymin, xmax, ymax];
     this.center = { x: avg(xmin, xmax), y: avg(ymin, ymax) };
     this.str = this.bbox.join(",");
