@@ -1,6 +1,6 @@
 {
   "name": "geo-extent",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "description": "Simple, Modern Geospatial Bounding Boxes",
   "main": "geo-extent.js",
   "type": "module",
