@@ -274,7 +274,7 @@ export class GeoExtent {
 
   reproj(to, { quiet = false } = { quiet: false }) {
     // don't need to reproject, so just return a clone
-    if (isDef(this.srs) && this.srs === to) this.clone();
+    if (isDef(this.srs) && this.srs === to) return this.clone();
 
     if (!isDef(this.srs)) {
       if (quiet) return;
