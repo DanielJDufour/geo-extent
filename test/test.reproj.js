@@ -23,3 +23,25 @@ test("north pole", ({ eq }) => {
 
   eq(northPole.reproj(3857, { quiet: true }), undefined);
 });
+
+test("reproject extent that crosses 180th meridian", ({ eq }) => {
+  // technically this layer is self-overlapping
+  const lyr = new GeoExtent([-180.00092731781535, 15.563268747733936, 179.99907268220255, 74.71076874773686], {
+    srs: 4326
+  });
+  const result = lyr.reproj(3857);
+  eq(result.bbox, [-20037508.342789244, 1754201.542789432, 20037508.342789244, 12808999.953599941]);
+});
+
+test("reproject extent that crosses 180th meridian and stops at prime meridian", ({ eq }) => {
+  const [XMIN_WEBMERC, YMIN_WEBMERC, XMAX_WEBMERC, YMAX_WEBMERC] = new GeoExtent([-180, -80, 180, 80], {
+    srs: 4326
+  }).reproj(3857).bbox;
+  const lyr = new GeoExtent([-180.00092731781535, 15.563268747733936, 0, 74.71076874773686], {
+    srs: 4326
+  });
+  const result = lyr.reproj(3857);
+  eq(result.bbox, [-20037508.342789244, 1754201.542789432, 20037508.342789244, 12808999.953599941]);
+  eq(result.xmin, XMIN_WEBMERC);
+  eq(result.xmax, XMAX_WEBMERC);
+});

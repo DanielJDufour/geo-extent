@@ -7,3 +7,42 @@ test("crop kenya by NE tile", ({ eq }) => {
   const result = kenya.crop(tile);
   eq(result.bbox, [34.4282, 0, 41.3861, 4.4296]);
 });
+
+test("crop by self-overlapping extent", ({ eq }) => {
+  // technically, this lyr extent is self-overlapping
+  const lyr = new GeoExtent([-180.00092731781535, 15.563268747733936, 179.99907268220255, 74.71076874773686], {
+    srs: 4326
+  });
+
+  const tile = new GeoExtent([-20037508.342789244, -20037508.342789255, 20037508.342789244, 20037508.342789244], {
+    srs: 3857
+  });
+
+  const result = tile.crop(lyr, { debug: true });
+  eq(result.srs, tile.srs);
+  eq(result.bbox, [-20037508.342789244, 1754201.542789432, 20037508.342789244, 12808999.953599941]);
+  eq(result.width, 40075016.68557849);
+});
+
+test("crop by left-overflow extent", ({ eq }) => {
+  const tile = new GeoExtent([-20037508.342789244, -20037508.342789255, 20037508.342789244, 20037508.342789244], {
+    srs: 3857
+  });
+
+  // technically, this lyr extent is self-overlapping
+  const lyr = new GeoExtent([-180.00092731781535, 15.563268747733936, 0, 74.71076874773686], {
+    srs: 4326
+  });
+
+  const result = tile.crop(lyr, { debug: true });
+  eq(result.srs, tile.srs);
+  eq(result.bbox, [-20037508.342789244, 1754201.542789432, 20037508.342789244, 12808999.953599941]);
+  eq(result.width, 40075016.68557849);
+});
+
+test("crop with no overlap", ({ eq }) => {
+  const kenya = new GeoExtent([34.4282, -4.2367, 41.3861, 4.4296], { srs: 4326 });
+  const nw = new GeoExtent([-180, 0, 0, 90], { srs: 4326 });
+  const result = nw.crop(kenya);
+  eq(result, null);
+});

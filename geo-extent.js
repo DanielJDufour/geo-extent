@@ -198,18 +198,41 @@ export class GeoExtent {
     return xContains && yContains;
   }
 
+  // should return null if no overlap
   crop(other) {
     other = new this.constructor(other);
+
+    // if really no overlap then return null
+    if (this.overlaps(other, { quiet: true }) === false && other.overlaps(this, { quiet: true }) === false) return null;
 
     // first check if other fully contains this extent
     // in which case, we don't really need to crop
     // and can just return the extent of this
     if (other.contains(this)) return this.clone();
 
+    // check if special case where other crosses 180th meridian
+    if (other.srs === "EPSG:4326" && (other.xmin < -180 || other.xmax > 180)) {
+      const parts = other.unwrap();
+
+      let cropped = parts.map(it => this.crop(it));
+
+      // filter out any parts that are null (didn't overlap)
+      cropped = cropped.filter(Boolean);
+
+      // no overlap
+      if (cropped.length === 0) return null;
+
+      let combo = cropped[0];
+      for (let i = 1; i < cropped.length; i++) combo = combo.combine(cropped[i]);
+
+      return combo;
+    }
+
     // if both this and other have srs defined reproject
     // otherwise, assume they are the same projection
     let another = isDef(this.srs) && isDef(other.srs) ? other.reproj(this.srs, { quiet: true }) : other.clone();
     if (another) {
+      if (!this.overlaps(another)) return null;
       const xmin = Math.max(this.xmin, another.xmin);
       const ymin = Math.max(this.ymin, another.ymin);
       const xmax = Math.min(this.xmax, another.xmax);
@@ -218,8 +241,12 @@ export class GeoExtent {
     }
 
     // fall back to converting everything to 4326 and cropping there
-    const [aMinLon, aMinLat, aMaxLon, aMaxLat] = isDef(this.srs) ? this.reproj(4326).bbox : this.bbox;
-    const [bMinLon, bMinLat, bMaxLon, bMaxLat] = isDef(other.srs) ? other.reproj(4326).bbox : other.bbox;
+    const this4326 = isDef(this.srs) ? this.reproj(4326) : this;
+    const other4326 = isDef(other.srs) ? other.reproj(4326) : other;
+    const [aMinLon, aMinLat, aMaxLon, aMaxLat] = this4326.bbox;
+    const [bMinLon, bMinLat, bMaxLon, bMaxLat] = other4326.bbox;
+
+    if (!this4326.overlaps(other4326)) return null;
 
     const minLon = Math.max(aMinLon, bMinLon);
     const minLat = Math.max(aMinLat, bMinLat);
@@ -263,13 +290,18 @@ export class GeoExtent {
     Or at least make the user have to be explicit about the functionality via
     a flag like overlaps(geojson, { strict: false })
   */
-  overlaps(other) {
-    const [_this, _other] = this._pre(this, other);
+  overlaps(other, { quiet = false } = { quite: false }) {
+    try {
+      const [_this, _other] = this._pre(this, other);
 
-    const yOverlaps = _other.ymin <= _this.ymax && _other.ymax >= _this.ymin;
-    const xOverlaps = _other.xmin <= _this.xmax && _other.xmax >= _this.xmin;
+      const yOverlaps = _other.ymin <= _this.ymax && _other.ymax >= _this.ymin;
+      const xOverlaps = _other.xmin <= _this.xmax && _other.xmax >= _this.xmin;
 
-    return xOverlaps && yOverlaps;
+      return xOverlaps && yOverlaps;
+    } catch (error) {
+      if (quiet) return;
+      else throw error;
+    }
   }
 
   reproj(to, { quiet = false } = { quiet: false }) {
@@ -280,6 +312,20 @@ export class GeoExtent {
       if (quiet) return;
       throw new Error(`[geo-extent] cannot reproject ${this.bbox} without a projection set`);
     }
+
+    // unwrap, reproject pieces, and combine
+    if (this.srs === "EPSG:4326" && (this.xmin < -180 || this.xmax > 180)) {
+      try {
+        const parts = this.unwrap().map(ext => ext.reproj(to));
+        let combo = parts[0];
+        for (let i = 1; i < parts.length; i++) combo = combo.combine(parts[i]);
+        return combo;
+      } catch (error) {
+        if (quiet) return;
+        throw error;
+      }
+    }
+
     const reprojected = reprojectBoundingBox({
       bbox: this.bbox,
       from: this.srs,
@@ -291,6 +337,38 @@ export class GeoExtent {
       throw new Error(`[geo-extent] failed to reproject ${this.bbox} from ${this.srs} to ${to}`);
     }
     return new GeoExtent(reprojected, { srs: to });
+  }
+
+  unwrap() {
+    const { xmin, ymin, xmax, ymax, srs } = this;
+
+    // not in 4326, so just return a clone
+    if (srs !== "EPSG:4326") return [this.clone()];
+
+    // extent is within the normal extent of the earth, so return clone
+    if (xmin > -180 && xmax < 180) return [this.clone()];
+
+    // handle special case where extent overflows xmin and then overlaps itself
+    if (xmin < -180 && xmax >= xmin + 360) return [new this.constructor([-180, ymin, 180, ymax], { srs: 4326 })];
+
+    if (xmax > 180 && xmin <= xmax - 360) return [new this.constructor([-180, ymin, 180, ymax], { srs: 4326 })];
+
+    let extents = [];
+
+    // extent overflows left edge of the world
+    if (xmin < -180) {
+      extents.push(new this.constructor([xmin + 360, ymin, 180, ymax], { srs }));
+    }
+
+    // add extent for part between -180 to 180 longitude
+    extents.push(new this.constructor([xmin < -180 ? -180 : xmin, ymin, xmax > 180 ? 180 : xmax, ymax], { srs }));
+
+    // extent overflows right edge of the world
+    if (this.xmax > 180) {
+      extents.push(new this.constructor([-180, ymin, xmax - 360, ymax], { srs }));
+    }
+
+    return extents;
   }
 
   asEsriJSON() {
