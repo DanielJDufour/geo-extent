@@ -1,6 +1,6 @@
 # Function: Crop
 Each GeoExtent has a crop function which allows you to make sure an extent doesn't exceed the boundaries of another extent.  In other words, if `c` is the extent of a county and `t` is the extent of a mercator tile, then `c.crop(t)` would return the extent of the county that falls within the tile.
-If `c` and `t` don't share the same [srs](https://en.wikipedia.org/wiki/Spatial_reference_system), then GeoExtent will automatically and internally [clone](https://github.com/DanielJDufour/geo-extent/blob/main/docs/functions/clone.md) `t` and [reproject](https://github.com/DanielJDufour/geo-extent/blob/main/docs/functions/reproj.md) the clone to the srs of `c` before cropping with it.
+If `c` and `t` don't share the same [srs](https://en.wikipedia.org/wiki/Spatial_reference_system), then GeoExtent will automatically and internally [clone](https://github.com/DanielJDufour/geo-extent/blob/main/docs/functions/clone.md) `t` and [reproject](https://github.com/DanielJDufour/geo-extent/blob/main/docs/functions/reproj.md) the clone to the srs of `c` before cropping with it.  If there is no overlap between `c` and `t`, then `c.crop(t)` will return null;
 
 ```js
 import { GeoExtent } from 'geo-extent';
@@ -35,4 +35,3 @@ GeoExtent {
   str: '34.4282,0,41.3861,4.4296'
 }
 ```
-
