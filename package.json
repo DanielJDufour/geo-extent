@@ -44,7 +44,7 @@
     "leaflet": "^1.7.1"
   },
   "dependencies": {
-    "get-epsg-code": "^0.0.5",
+    "get-epsg-code": "^0.0.7",
     "reproject-bbox": "^0.0.3"
   }
 }
