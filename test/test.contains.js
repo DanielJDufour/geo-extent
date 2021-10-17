@@ -1,5 +1,5 @@
 import test from "flug";
-import { GeoExtent } from "../geo-extent.js";
+import { GeoExtent } from "../src/geo-extent.js";
 
 test("contains", ({ eq }) => {
   const area = new GeoExtent([-1252344.2714243277, -7.081154551613622e-10, 0, 1252344.2714243277], { srs: 3857 });

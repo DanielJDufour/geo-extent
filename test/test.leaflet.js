@@ -1,7 +1,7 @@
 import test from "flug";
 import "global-jsdom/register";
 import Leaflet from "leaflet";
-import { GeoExtent } from "../geo-extent.js";
+import { GeoExtent } from "../src/geo-extent.js";
 
 test("Leaflet's bounds", ({ eq }) => {
   const xmin = -48;

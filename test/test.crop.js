@@ -1,5 +1,5 @@
 import test from "flug";
-import { GeoExtent } from "../geo-extent.js";
+import { GeoExtent } from "../src/geo-extent.js";
 
 test("crop kenya by NE tile", ({ eq }) => {
   const kenya = new GeoExtent([34.4282, -4.2367, 41.3861, 4.4296], { srs: 4326 });

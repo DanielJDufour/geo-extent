@@ -2,15 +2,20 @@
   "name": "geo-extent",
   "version": "0.3.0",
   "description": "Simple, Modern Geospatial Bounding Boxes",
-  "main": "geo-extent.js",
+  "main": "./dist/geo-extent.cjs",
+  "module": "./dist/geo-extent.mjs",
   "type": "module",
   "files": [
-    "geo-extent.js"
+    "./src/geo-extent.js",
+    "./dist/geo-extent.cjs",
+    "./dist/geo-extent.mjs"
   ],
   "scripts": {
-    "format": "npx prettier --arrow-parens=avoid --print-width=120 --trailing-comma=none --write *.js test/*.js",
+    "build": "cp ./src/geo-extent.js ./dist/geo-extent.mjs && npx babel ./src/geo-extent.js --out-file ./dist/geo-extent.cjs --plugins=@babel/plugin-transform-modules-commonjs",
+    "format": "npx prettier --arrow-parens=avoid --print-width=120 --trailing-comma=none --write src/*.js test/*.js",
+    "prepublishOnly": "npm run format",
     "test": "for f in ./test/*; do node $f; done",
-    "test:html": "npx snowpack dev --polyfill-node"
+    "test:html": "snowpack dev --polyfill-node"
   },
   "repository": {
     "type": "git",
@@ -38,10 +43,14 @@
   },
   "homepage": "https://github.com/DanielJDufour/geo-extent#readme",
   "devDependencies": {
+    "@babel/cli": "^7.15.7",
+    "@babel/core": "^7.15.8",
+    "@babel/plugin-transform-modules-commonjs": "^7.15.4",
     "flug": "^2.1.0",
     "global-jsdom": "^8.1.0",
     "jsdom": "^17.0.0",
-    "leaflet": "^1.7.1"
+    "leaflet": "^1.7.1",
+    "snowpack": "^3.8.8"
   },
   "dependencies": {
     "get-epsg-code": "^0.0.7",

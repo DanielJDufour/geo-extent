@@ -1,5 +1,5 @@
 import test from "flug";
-import { GeoExtent } from "../geo-extent.js";
+import { GeoExtent } from "../src/geo-extent.js";
 
 test("combine southern and northern hemisphers", ({ eq }) => {
   const ne = new GeoExtent({ xmin: 0, ymin: 0, xmax: 180, ymax: 90, srs: 4326 });

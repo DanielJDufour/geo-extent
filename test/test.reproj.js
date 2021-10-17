@@ -1,5 +1,5 @@
 import test from "flug";
-import { GeoExtent } from "../geo-extent.js";
+import { GeoExtent } from "../src/geo-extent.js";
 
 test("reproj error", ({ eq }) => {
   let msg;

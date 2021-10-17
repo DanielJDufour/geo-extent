@@ -1,5 +1,5 @@
 import test from "flug";
-import { GeoExtent } from "../geo-extent.js";
+import { GeoExtent } from "../src/geo-extent.js";
 
 /*
 test("creating exten from GeoJSON point", ({ eq }) => {

@@ -1,5 +1,5 @@
 import test from "flug";
-import { GeoExtent } from "../geo-extent.js";
+import { GeoExtent } from "../src/geo-extent.js";
 
 test("equals", ({ eq }) => {
   const bbox = [-10605790.548624776, 3355891.2898323783, -10596006.609004272, 3365675.2294528796];

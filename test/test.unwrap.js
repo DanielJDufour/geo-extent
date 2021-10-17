@@ -1,5 +1,5 @@
 import test from "flug";
-import { GeoExtent } from "../geo-extent.js";
+import { GeoExtent } from "../src/geo-extent.js";
 
 test("unwrap uneccessary", ({ eq }) => {
   const extent = new GeoExtent([-180, -90, 180, 90], { srs: 4326 });
