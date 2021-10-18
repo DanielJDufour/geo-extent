@@ -6,9 +6,9 @@
   "module": "./dist/geo-extent.mjs",
   "type": "module",
   "files": [
-    "./src/geo-extent.js",
-    "./dist/geo-extent.cjs",
-    "./dist/geo-extent.mjs"
+    "src/geo-extent.js",
+    "dist/geo-extent.cjs",
+    "dist/geo-extent.mjs"
   ],
   "scripts": {
     "build": "cp ./src/geo-extent.js ./dist/geo-extent.mjs && npx babel ./src/geo-extent.js --out-file ./dist/geo-extent.cjs --plugins=@babel/plugin-transform-modules-commonjs",
