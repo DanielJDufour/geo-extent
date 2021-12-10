@@ -1,6 +1,6 @@
 {
   "name": "geo-extent",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "Simple, Modern Geospatial Bounding Boxes",
   "main": "dist/geo-extent.cjs",
   "module": "dist/geo-extent.mjs",
