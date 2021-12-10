@@ -58,4 +58,5 @@ test("reproject extent that crosses 180th meridian and stops at prime meridian",
   eq(result.bbox, [-20037508.342789244, 1754201.542789432, 20037508.342789244, 12808999.953599941]);
   eq(result.xmin, XMIN_WEBMERC);
   eq(result.xmax, XMAX_WEBMERC);
+  eq(result.srs, 3857);
 });
