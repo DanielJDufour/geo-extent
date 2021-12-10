@@ -33,6 +33,15 @@ const hasKey = (o, k) => isObj(o) && o[k] !== undefined && o[k] !== null;
 const hasKeys = (o, ks) => ks.every(k => hasKey(o, k));
 const allNums = ary => isAry(ary) && ary.every(isNum);
 const getConstructor = o => (typeof obj === "object" && typeof obj.constructor === "function") || undefined;
+const normalize = srs => {
+  if (!srs) return srs;
+  if (isStr(srs) && srs.startsWith("EPSG:")) return srs;
+  if (isStr(srs) && srs.match(/^\d+$/)) return "EPSG:" + srs;
+  else if (isNum(srs)) return "EPSG:" + srs;
+  const code = getEPSGCode(srs);
+  if (isNum(code)) return "EPSG:" + code;
+  return srs;
+};
 
 // currently unused
 // const getConstructorName = o =>
@@ -62,19 +71,13 @@ const getConstructor = o => (typeof obj === "object" && typeof obj.constructor =
 
 export class GeoExtent {
   constructor(o, { srs } = {}) {
-    if (isNum(srs)) {
-      this.srs = "EPSG:" + srs;
-    } else if (isStr(srs) && srs.startsWith("EPSG:")) {
-      this.srs = srs;
-    } else if (isDef(srs)) {
-      this.srs = srs;
-    }
+    this.srs = normalize(srs);
 
     let xmin, xmax, ymin, ymax;
     if (getConstructor(o) === this.constructor) {
       ({ xmin, xmax, ymin, ymax } = o);
       if (isDef(o.srs)) {
-        this.srs = o.srs;
+        this.srs = normalize(o.srs);
       }
     }
     if (isAry(o) && o.length === 4 && allNums(o)) {
@@ -83,7 +86,7 @@ export class GeoExtent {
       [[ymin, xmin], [ymax, xmax]] = o;
     } else if (isLeafletLatLngBounds(o)) {
       (xmin = o.getWest()), (xmax = o.getEast()), (ymin = o.getSouth()), (ymax = o.getNorth());
-      if (!this.srs) this.srs = "EPSG:4326";
+      if (!isDef(this.srs)) this.srs = "EPSG:4326";
     } else if (isAry(o) && o.length === 2 && o.every(it => hasKeys(it, ["x", "y"]))) {
       [{ x: xmin, y: ymin }, { x: xmax, y: ymax }] = o;
     } else if (isObj(o) && hasKeys(o, ["x", "y"]) && isNum(o.x) && isNum(o.y)) {
@@ -92,7 +95,7 @@ export class GeoExtent {
       xmin = xmax = o.x;
       ymin = ymax = o.y;
       if (hasKey(o, "spatialReference") && hasKey(o.spatialReference, "wkid")) {
-        if (!this.srs) this.srs = o.spatialReference.wkid;
+        if (!isDef(this.srs)) this.srs = normalize(o.spatialReference.wkid);
       }
     } else if (isObj(o) && hasKeys(o, ["xmin", "xmax", "ymin", "ymax"])) {
       ({ xmin, xmax, ymin, ymax } = o);
@@ -101,12 +104,9 @@ export class GeoExtent {
       for (let i = 0; i < keys.length; i++) {
         const k = keys[i];
         const v = o[k];
-        if (isNum(v)) {
-          this.srs = "EPSG:" + v;
-          break;
-        } else if (isStr(v)) {
-          const code = getEPSGCode(v);
-          if (isNum(code)) this.srs = "EPSG:" + code;
+        const normalized = normalize(v);
+        if (normalized) {
+          this.srs = normalized;
           break;
         }
       }
@@ -305,8 +305,10 @@ export class GeoExtent {
   }
 
   reproj(to, { quiet = false } = { quiet: false }) {
+    to = normalize(to); // normalize srs
+
     // don't need to reproject, so just return a clone
-    if (isDef(this.srs) && this.srs === to) return this.clone();
+    if (isDef(this.srs) && this.srs === normalize(to)) return this.clone();
 
     if (!isDef(this.srs)) {
       if (quiet) return;
