@@ -54,6 +54,6 @@
   },
   "dependencies": {
     "get-epsg-code": "^0.0.7",
-    "reproject-bbox": "^0.1.0"
+    "reproject-bbox": "^0.2.0"
   }
 }
