@@ -14,8 +14,7 @@
     "build": "cp ./src/geo-extent.js ./dist/geo-extent.mjs && npx babel ./src/geo-extent.js --out-file ./dist/geo-extent.cjs --plugins=@babel/plugin-transform-modules-commonjs",
     "format": "npx prettier --arrow-parens=avoid --print-width=120 --trailing-comma=none --write src/*.js test/*.js test/*.mjs",
     "prepublishOnly": "npm run format",
-    "test": "for f in ./test/*; do node $f; done",
-    "test:html": "snowpack dev --polyfill-node"
+    "test": "for f in ./test/*; do node $f; done"
   },
   "repository": {
     "type": "git",
@@ -45,6 +44,8 @@
   "devDependencies": {
     "@babel/cli": "^7.15.7",
     "@babel/core": "^7.15.8",
+    "@babel/helper-compilation-targets": "^7.16.3",
+    "@babel/helper-validator-option": "^7.14.5",
     "@babel/plugin-transform-modules-commonjs": "^7.15.4",
     "flug": "^2.1.0",
     "global-jsdom": "^8.1.0",
