@@ -50,8 +50,7 @@
     "flug": "^2.1.0",
     "global-jsdom": "^8.1.0",
     "jsdom": "^17.0.0",
-    "leaflet": "^1.7.1",
-    "snowpack": "^3.8.8"
+    "leaflet": "^1.7.1"
   },
   "dependencies": {
     "big.js": "^6.1.1",
