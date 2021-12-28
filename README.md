@@ -6,6 +6,7 @@
 - chainable: ex: `extent.reproj(3857).crop(other).toGeoJSON()`
 - universal input: works with bbox arrays, xy corner points, and Leaflet bounds
 - interoperability: integrates well with Leaflet, OpenLayers, and ESRI
+- precise: avoids common floating-point arithmetic issues by using [big.js](https://www.npmjs.com/package/big.js)
 
 # install
 ```bash
