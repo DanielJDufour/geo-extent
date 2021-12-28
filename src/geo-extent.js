@@ -2,10 +2,11 @@
  * TO DO:
  * add support for GeoJSON and need to check projection of GeoJSON
  */
+import Big from "big.js";
 import getEPSGCode from "get-epsg-code";
 import reprojectBoundingBox from "reproject-bbox";
 
-const avg = (a, b) => (a + b) / 2;
+const avg = (a, b) => Big(a).plus(Big(b)).div(Big(2));
 const isAry = o => Array.isArray(o);
 const isDef = o => o !== undefined && o !== null && o !== "";
 const isFunc = o => typeof o === "function";
@@ -32,6 +33,7 @@ const hasObjs = (o, ks) => ks.every(k => hasObj(o, k));
 const hasKey = (o, k) => isObj(o) && o[k] !== undefined && o[k] !== null;
 const hasKeys = (o, ks) => ks.every(k => hasKey(o, k));
 const allNums = ary => isAry(ary) && ary.every(isNum);
+const allStrs = ary => isAry(ary) && ary.every(isStr);
 const getConstructor = o => (typeof obj === "object" && typeof obj.constructor === "function") || undefined;
 const normalize = srs => {
   if (!srs) return srs;
@@ -74,6 +76,7 @@ export class GeoExtent {
     this.srs = normalize(srs);
 
     let xmin, xmax, ymin, ymax;
+    let xmin_str, xmax_str, ymin_str, ymax_str;
     if (getConstructor(o) === this.constructor) {
       ({ xmin, xmax, ymin, ymax } = o);
       if (isDef(o.srs)) {
@@ -82,6 +85,9 @@ export class GeoExtent {
     }
     if (isAry(o) && o.length === 4 && allNums(o)) {
       [xmin, ymin, xmax, ymax] = o;
+    } else if (isAry(o) && o.length === 4 && allStrs(o)) {
+      [xmin_str, ymin_str, xmax_str, ymax_str] = o;
+      [xmin, ymin, xmax, ymax] = o.map(str => Number(str));
     } else if (isAry(o) && o.length === 2 && o.every(isAry) && o.every(o => o.length === 2 && allNums(o))) {
       [[ymin, xmin], [ymax, xmax]] = o;
     } else if (isLeafletLatLngBounds(o)) {
@@ -139,11 +145,21 @@ export class GeoExtent {
     }
 
     this.xmin = xmin;
+    this.xmin_str = xmin_str || xmin.toString();
     this.ymin = ymin;
+    this.ymin_str = ymin_str || ymin.toString();
     this.xmax = xmax;
+    this.xmax_str = xmax_str || xmax.toString();
     this.ymax = ymax;
-    this.width = xmax - xmin;
-    this.height = ymax - ymin;
+    this.ymax_str = ymax_str || ymax.toString();
+
+    const width = Big(this.xmax_str).minus(this.xmin_str);
+    this.width = width.toNumber();
+    this.width_str = width.toString();
+
+    const height = Big(this.ymax_str).minus(this.ymin_str);
+    this.height = height.toNumber();
+    this.height_str = height.toString();
 
     // corners
     this.bottomLeft = { x: xmin, y: ymin };
@@ -156,11 +172,26 @@ export class GeoExtent {
       [this.ymax, this.xmax]
     ];
 
-    this.area = this.width * this.height;
-    this.perimeter = 2 * this.width + 2 * this.height;
+    const area = Big(width).times(height);
+    this.area = area.toNumber();
+    this.area_str = area.toString();
+
+    const perimeter = width.times(2).plus(height.times(2));
+    this.perimeter = perimeter.toNumber();
+    this.perimeter_str = perimeter.toString();
+
     this.bbox = [xmin, ymin, xmax, ymax];
-    this.center = { x: avg(xmin, xmax), y: avg(ymin, ymax) };
-    this.str = this.bbox.join(",");
+    this.bbox_str = [this.xmin_str, this.ymin_str, this.xmax_str, this.ymax_str];
+
+    const center = {
+      x: avg(xmin_str || xmin, xmax_str || xmax),
+      y: avg(ymin_str || ymin, ymax_str || ymax)
+    };
+
+    this.center = { x: center.x.toNumber(), y: center.y.toNumber() };
+    this.center_str = { x: center.x.toString(), y: center.y.toString() };
+
+    this.str = this.bbox_str.join(",");
   }
 
   _pre(_this, _other) {

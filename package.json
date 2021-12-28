@@ -12,7 +12,7 @@
   ],
   "scripts": {
     "build": "cp ./src/geo-extent.js ./dist/geo-extent.mjs && npx babel ./src/geo-extent.js --out-file ./dist/geo-extent.cjs --plugins=@babel/plugin-transform-modules-commonjs",
-    "format": "npx prettier --arrow-parens=avoid --print-width=120 --trailing-comma=none --write src/*.js test/*.js",
+    "format": "npx prettier --arrow-parens=avoid --print-width=120 --trailing-comma=none --write src/*.js test/*.js test/*.mjs",
     "prepublishOnly": "npm run format",
     "test": "for f in ./test/*; do node $f; done",
     "test:html": "snowpack dev --polyfill-node"
@@ -53,6 +53,7 @@
     "snowpack": "^3.8.8"
   },
   "dependencies": {
+    "big.js": "^6.1.1",
     "get-epsg-code": "^0.0.7",
     "reproject-bbox": "^0.2.0"
   }
