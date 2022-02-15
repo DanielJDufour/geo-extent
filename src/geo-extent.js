@@ -2,11 +2,14 @@
  * TO DO:
  * add support for GeoJSON and need to check projection of GeoJSON
  */
-import Big from "big.js";
+import add from "preciso/add.js";
+import divide from "preciso/divide.js";
+import multiply from "preciso/multiply.js";
+import subtract from "preciso/subtract.js";
 import getEPSGCode from "get-epsg-code";
 import reprojectBoundingBox from "reproject-bbox";
 
-const avg = (a, b) => Big(a).plus(Big(b)).div(Big(2));
+const avg = (a, b) => divide(add(a.toString(), b.toString()), "2");
 const isAry = o => Array.isArray(o);
 const isDef = o => o !== undefined && o !== null && o !== "";
 const isFunc = o => typeof o === "function";
@@ -153,13 +156,11 @@ export class GeoExtent {
     this.ymax = ymax;
     this.ymax_str = ymax_str || ymax.toString();
 
-    const width = Big(this.xmax_str).minus(this.xmin_str);
-    this.width = width.toNumber();
-    this.width_str = width.toString();
+    this.width_str = subtract(this.xmax_str, this.xmin_str);
+    this.width = Number(this.width_str);
 
-    const height = Big(this.ymax_str).minus(this.ymin_str);
-    this.height = height.toNumber();
-    this.height_str = height.toString();
+    this.height_str = subtract(this.ymax_str, this.ymin_str);
+    this.height = Number(this.height_str);
 
     // corners
     this.bottomLeft = { x: xmin, y: ymin };
@@ -172,24 +173,20 @@ export class GeoExtent {
       [this.ymax, this.xmax]
     ];
 
-    const area = Big(width).times(height);
-    this.area = area.toNumber();
-    this.area_str = area.toString();
+    this.area_str = multiply(this.width_str, this.height_str);
+    this.area = Number(this.area_str);
 
-    const perimeter = width.times(2).plus(height.times(2));
-    this.perimeter = perimeter.toNumber();
-    this.perimeter_str = perimeter.toString();
+    this.perimeter_str = add(multiply(this.width_str, "2"), multiply(this.height_str, "2"));
+    this.perimeter = Number(this.perimeter_str);
 
     this.bbox = [xmin, ymin, xmax, ymax];
     this.bbox_str = [this.xmin_str, this.ymin_str, this.xmax_str, this.ymax_str];
 
-    const center = {
+    this.center_str = {
       x: avg(xmin_str || xmin, xmax_str || xmax),
       y: avg(ymin_str || ymin, ymax_str || ymax)
     };
-
-    this.center = { x: center.x.toNumber(), y: center.y.toNumber() };
-    this.center_str = { x: center.x.toString(), y: center.y.toString() };
+    this.center = { x: Number(this.center_str.x), y: Number(this.center_str.y) };
 
     this.str = this.bbox_str.join(",");
   }
@@ -447,4 +444,9 @@ export class GeoExtent {
   }
 }
 
+if (typeof define === "function" && define.amd)
+  define(function () {
+    return GeoExtent;
+  });
+if (typeof self === "object") self.GeoExtent = GeoExtent;
 if (typeof window === "object") window.GeoExtent = GeoExtent;
