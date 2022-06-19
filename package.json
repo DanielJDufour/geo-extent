@@ -7,6 +7,7 @@
   "type": "module",
   "types": "./types.d.ts",
   "files": [
+    "types.d.ts",
     "src/geo-extent.js",
     "dist/geo-extent.cjs",
     "dist/geo-extent.mjs"
