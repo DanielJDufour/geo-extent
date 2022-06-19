@@ -1,4 +1,6 @@
-export type GeoExtent = {
+export class GeoExtent {
+  constructor(o: any, data?: { srs: string | number });
+
   // properties
   bbox: [number, number, number, number];
   bbox_str: [string, string, string, string];
@@ -29,14 +31,14 @@ export type GeoExtent = {
   leafletBounds: [[number, number], [number, number]];
 
   // functions
-  asEsriJSON: () => { xmin: number, ymin: number, xmax: number, ymax: number, spatialReference: { wkid: string }};
-  asGeoJSON: () => { type: "Feature", geometry: { type: "Polygon", coordinates: [number[]]}};
-  clone: () => GeoExtent;
-  combine: (other: GeoExtent) => GeoExtent;
-  contains: (other: GeoExtent) => GeoExtent;
-  crop: (other: GeoExtent) => GeoExtent;
+  asEsriJSON(): { xmin: number, ymin: number, xmax: number, ymax: number, spatialReference: { wkid: string }};
+  asGeoJSON(): { type: "Feature", geometry: { type: "Polygon", coordinates: [number[]]}};
+  clone(): GeoExtent;
+  combine(other: GeoExtent): GeoExtent;
+  contains(other: GeoExtent): GeoExtent;
+  crop(other: GeoExtent): GeoExtent;
   equals: (other: GeoExtent, options?: { digits?: number }) => boolean;
-  overlaps: (other: GeoExtent) => boolean;
+  overlaps(other: GeoExtent): boolean;
   reproj: ((srs: number, options?: { quiet: false }) => GeoExtent) | ((srs: number, options: { quiet: true }) => (GeoExtent | undefined));
-  unwrap: () => GeoExtent[];
+  unwrap(): GeoExtent[];
 }
