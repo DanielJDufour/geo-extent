@@ -1,5 +1,5 @@
 export class GeoExtent {
-  constructor(o: any, data?: { srs: string | number });
+  constructor(o: any, data?: { srs?: string | number });
 
   // properties
   bbox: [number, number, number, number];
