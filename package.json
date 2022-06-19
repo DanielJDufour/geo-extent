@@ -5,6 +5,7 @@
   "main": "dist/geo-extent.cjs",
   "module": "dist/geo-extent.mjs",
   "type": "module",
+  "types": "./types.d.ts",
   "files": [
     "src/geo-extent.js",
     "dist/geo-extent.cjs",
@@ -12,9 +13,10 @@
   ],
   "scripts": {
     "build": "cp ./src/geo-extent.js ./dist/geo-extent.mjs && npx babel ./src/geo-extent.js --out-file ./dist/geo-extent.cjs --plugins=@babel/plugin-transform-modules-commonjs",
+    "f": "npm run format",
     "format": "npx prettier --arrow-parens=avoid --print-width=120 --trailing-comma=none --write src/*.js test/*.js test/*.mjs",
     "prepublishOnly": "npm run format",
-    "test": "for f in ./test/*; do node $f; done"
+    "test": "for f in ./test/*; do echo \"node $f\" && node $f && echo \"npx ts-node $f\" && npx ts-node $f; done"
   },
   "repository": {
     "type": "git",
