@@ -21,6 +21,10 @@ You can also create an extent from a bounding box array of strings.  (Sometimes 
 ```js
 new GeoExtent(['7698736.8577886725053', '160793.853073251455', '10066450.2459496622445', '1322636.683007621705']);
 ```
+You can also create an extent from a singular stringified array.
+```js
+new GeoExtent('7698736.8577886725053,160793.853073251455,10066450.2459496622445,1322636.683007621705');
+```
 
 ## Creating from LeafletJS Bounds Array
 [LeafletJS](https://leafletjs.com/) will sometimes represent bounds as an array of two corner points, the southest and northeast.
