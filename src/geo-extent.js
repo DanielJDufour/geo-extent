@@ -28,6 +28,7 @@ const isFunc = o => typeof o === "function";
 const isObj = o => typeof o === "object";
 const isStr = o => typeof o === "string";
 const isNum = o => typeof o === "number";
+const isBoxStr = o => isStr(o) && !!o.match(/^[-|+]?[\d\.]+(, ?[-|+]?[\d\.]+){3}$/);
 const isLeafletLatLngBounds = o => isObj(o) && hasFuncs(o, ["getEast", "getNorth", "getSouth", "getWest"]);
 const hasFunc = (o, f) => isObj(o) && isFunc(o[f]);
 const hasObj = (o, k) => isObj(o) && isObj(o[k]);
@@ -86,6 +87,9 @@ export class GeoExtent {
         this.srs = normalize(o.srs);
       }
     }
+
+    if (isBoxStr(o)) o = o.split(/, ?/);
+
     if (isAry(o) && o.length === 4 && allNums(o)) {
       [xmin, ymin, xmax, ymax] = o;
     } else if (isAry(o) && o.length === 4 && allStrs(o)) {

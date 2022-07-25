@@ -10,3 +10,14 @@ test("precision", ({ eq }) => {
   eq(ext.bbox_str, bbox);
   eq(ext.str, bbox.join(","));
 });
+
+// https://github.com/DanielJDufour/geo-extent/issues/4
+test("width calculation", ({ eq }) => {
+  const ext = new GeoExtent([0, 10.487811882056695, 0.351562500000006, 10.833305983642477]);
+  eq(ext.width.toString() !== "NaN", true);
+});
+
+test("precise bbox string", ({ eq }) => {
+  const ext = new GeoExtent("0,10.487811882056695,0.351562500000006,10.833305983642477");
+  eq(ext.width, 0.351562500000006);
+});
