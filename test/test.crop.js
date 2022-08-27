@@ -46,3 +46,14 @@ test("crop with no overlap", ({ eq }) => {
   const result = nw.crop(kenya);
   eq(result, null);
 });
+
+test("crop world tile", ({ eq }) => {
+  const extentOfTileInMapCRS = new GeoExtent([-20037508.342789244, -7.081154551613622e-10, 0, 20037508.342789244], {
+    srs: "EPSG:3857"
+  });
+
+  const cutline = new GeoExtent([205437, 3268524, 230448, 3280290], { srs: "EPSG:32615" });
+
+  const cropped = extentOfTileInMapCRS.crop(cutline);
+  console.log({ cropped });
+});

@@ -2,10 +2,35 @@
 <html>
   <head>
     <script src="https://unpkg.com/flug"></script>
-    <script src="./src/geo-extent.js" type="module"></script>
+    <script src="./dist/geo-extent.browserify.js" type="module"></script>
   </head>
   <body>
-    <script>process.env.TEST_NAME = "crop"</script>
-    <script src="./test/test.js" type="module"></script>
+    <!-- <script>process.env.TEST_NAME = "crop"</script> -->
+    <script>
+      test("crop kenya by NE tile", ({ eq }) => {
+        const kenya = new GeoExtent([34.4282, -4.2367, 41.3861, 4.4296], { srs: 4326 });
+        const tile = new GeoExtent([0, 0, 180, 90], { srs: 4326 });
+        const result = kenya.crop(tile);
+        eq(result.bbox, [34.4282, 0, 41.3861, 4.4296]);
+      });
+
+      test("crop world tile", ({ eq }) => {
+        const extentOfTileInMapCRS = new GeoExtent([
+          -20037508.342789244,
+          -7.081154551613622e-10,
+          0,
+          20037508.342789244
+        ], { srs: "EPSG:3857" });
+
+        const cutline = new GeoExtent([
+          205437,
+          3268524,
+          230448,
+          3280290
+        ], { srs: "EPSG:32615" });
+
+        const cropped = extentOfTileInMapCRS.crop(cutline);
+      });
+    </script>
   </body>
 </html>

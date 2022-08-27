@@ -1,3 +1,5 @@
+"use strict";
+
 /****
  * TO DO:
  * add support for GeoJSON and need to check projection of GeoJSON
