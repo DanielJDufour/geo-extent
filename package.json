@@ -4,13 +4,16 @@
   "description": "Simple, Modern Geospatial Bounding Boxes",
   "main": "dist/geo-extent.cjs",
   "module": "dist/geo-extent.mjs",
+  "unpkg": "dist/geo-extent.browserify.js",
+  "jsdelivr": "dist/geo-extent.browserify.js",
   "type": "module",
   "types": "./types.d.ts",
   "files": [
     "types.d.ts",
     "src/geo-extent.js",
     "dist/geo-extent.cjs",
-    "dist/geo-extent.mjs"
+    "dist/geo-extent.mjs",
+    "dist/geo-extent.browserify.js"
   ],
   "scripts": {
     "build": "cp ./src/geo-extent.js ./dist/geo-extent.mjs && npx babel ./src/geo-extent.js --out-file ./dist/geo-extent.cjs --plugins=@babel/plugin-transform-modules-commonjs",
