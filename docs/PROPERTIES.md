@@ -30,3 +30,5 @@ Once you've created a GeoExtent, you will have access to the following propertie
 | topRight | { x: 21, y: 74 } | The top-right corner of the extent |
 | str | '-72,-47,21,74' | A high-precision string representation of the GeoExtent's bbox. Helpful for passing as a parameter to API Services. |
 | leafletBounds | [<br/>&nbsp;&nbsp;[-47, -72],<br/>&nbsp;&nbsp;[74, 21]<br/>] | An array of two corners in form accepted by LeafletJS, which is [ [ymin, xmin], [ymax, xmax] ] |
+| wkt | "POLYGON((21 -47,21 74,-72 74,-72 -47,21 -47))" | [OGC Well-Known Text Polygon](https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry) |
+| ewkt | "SRID=4326;POLYGON((21 -47,21 74,-72 74,-72 -47,21 -47))" | [Extended WKT Polygon](https://postgis.net/docs/ST_AsEWKT.html) used by PostGIS (includes SRID) |
