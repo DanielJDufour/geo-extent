@@ -33,6 +33,11 @@ const isStr = o => typeof o === "string";
 const isNum = o => typeof o === "number";
 const isBoxStr = o => isStr(o) && !!o.match(/^[-|+]?[\d\.]+(, ?[-|+]?[\d\.]+){3}$/);
 const isLeafletLatLngBounds = o => isObj(o) && hasFuncs(o, ["getEast", "getNorth", "getSouth", "getWest"]);
+const wkt = bbox => {
+  const [xmin, ymin, xmax, ymax] = bbox;
+  return `POLYGON((${xmax} ${ymin},${xmax} ${ymax},${xmin} ${ymax},${xmin} ${ymin},${xmax} ${ymin}))`;
+};
+
 const hasFunc = (o, f) => isObj(o) && isFunc(o[f]);
 const hasObj = (o, k) => isObj(o) && isObj(o[k]);
 const hasFuncs = (o, fs) => fs.every(f => hasFunc(o, f));
@@ -196,6 +201,10 @@ export class GeoExtent {
     this.center = { x: Number(this.center_str.x), y: Number(this.center_str.y) };
 
     this.str = this.bbox_str.join(",");
+
+    this.wkt = wkt(this.bbox_str);
+
+    this.ewkt = (this.srs?.startsWith("EPSG:") ? this.srs.replace("EPSG:", "SRID=") + ";" : "") + this.wkt;
   }
 
   _pre(_this, _other) {
@@ -365,11 +374,17 @@ export class GeoExtent {
       }
     }
 
-    const reprojected = reprojectBoundingBox({
-      bbox: this.bbox,
-      from: this.srs,
-      to
-    });
+    let reprojected;
+    try {
+      reprojected = reprojectBoundingBox({
+        bbox: this.bbox,
+        from: this.srs,
+        to
+      });
+    } catch (error) {
+      if (quiet) return;
+      throw new Error(`[geo-extent] failed to reproject ${this.bbox} from ${this.srs} to ${to}`);
+    }
 
     if (reprojected.some(isNaN)) {
       if (quiet) return;
