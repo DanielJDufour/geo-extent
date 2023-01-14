@@ -1,8 +1,54 @@
 import test from "flug";
 import { GeoExtent } from "../src/geo-extent.js";
 
+test("asGeoJSON with in 4326 projection", ({ eq }) => {
+  const bbox = [-72, -47, 21, 74];
+  const srs = 4326;
+  const expected = {
+    type: "Feature",
+    properties: {},
+    geometry: {
+      type: "Polygon",
+      coordinates: [
+        [
+          [-72, 74],
+          [-72, -47],
+          [21, -47],
+          [21, 74],
+          [-72, 74]
+        ]
+      ]
+    },
+    bbox: [-72, -47, 21, 74]
+  };
+  eq(new GeoExtent(bbox, { srs: null }).asGeoJSON(), expected);
+  eq(new GeoExtent(bbox, { srs: undefined }).asGeoJSON(), expected);
+  eq(new GeoExtent(bbox, { srs }).asGeoJSON(), expected);
+});
+
+test("asGeoJSON", ({ eq }) => {
+  const extent = new GeoExtent([205437, 3268524, 230448, 3280290], { srs: 32615 });
+  eq(extent.asGeoJSON(), {
+    type: "Feature",
+    properties: {},
+    geometry: {
+      type: "Polygon",
+      coordinates: [
+        [
+          [-96.04179138404174, 29.61768905503229],
+          [-96.03861274870584, 29.511648519248368],
+          [-95.78087194851625, 29.517293624194604],
+          [-95.78378185428468, 29.623358437472554],
+          [-96.04179138404174, 29.61768905503229]
+        ]
+      ]
+    },
+    bbox: [-96.04179138404174, 29.511648519248368, -95.78087194851625, 29.623358437472554]
+  });
+});
+
 /*
-test("creating exten from GeoJSON point", ({ eq }) => {
+test("creating extent from GeoJSON point", ({ eq }) => {
   // from https://geojson.org/
   const geojson = {
     "type": "Feature",
@@ -23,4 +69,5 @@ test("creating exten from GeoJSON point", ({ eq }) => {
 test("creating extent from GeoJSON with bbox property set", ({ eq }) => {
   
 });
+
 */

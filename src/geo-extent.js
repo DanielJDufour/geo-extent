@@ -10,6 +10,7 @@ import multiply from "preciso/multiply.js";
 import subtract from "preciso/subtract.js";
 import getEPSGCode from "get-epsg-code";
 import reprojectBoundingBox from "reproject-bbox";
+import reprojectGeoJSON from "reproject-geojson";
 
 const avg = (a, b) => divide(add(a.toString(), b.toString()), "2");
 const isAry = o => Array.isArray(o);
@@ -237,7 +238,9 @@ export class GeoExtent {
     other = new this.constructor(other);
 
     // if really no overlap then return null
-    if (this.overlaps(other, { quiet: true }) === false && other.overlaps(this, { quiet: true }) === false) return null;
+    if (this.overlaps(other, { quiet: true }) === false && other.overlaps(this, { quiet: true }) === false) {
+      return null;
+    }
 
     // first check if other fully contains this extent
     // in which case, we don't really need to crop
@@ -420,22 +423,33 @@ export class GeoExtent {
   }
 
   asGeoJSON() {
-    const { xmin, ymin, xmax, ymax } = this.srs === "EPSG:4326" ? this : this.reproj(4326);
-    return {
+    const { xmin, ymin, xmax, ymax } = this;
+    let geojson = {
       type: "Feature",
+      properties: {},
       geometry: {
         type: "Polygon",
         coordinates: [
           [
             [xmin, ymax],
-            [xmax, ymax],
-            [xmax, ymin],
             [xmin, ymin],
+            [xmax, ymin],
+            [xmax, ymax],
             [xmin, ymax]
           ]
         ]
       }
     };
+    if (![undefined, null, "EPSG:4326"].includes(this.srs)) {
+      geojson = reprojectGeoJSON(geojson, { from: this.srs, to: "EPSG:4326", in_place: true });
+    }
+
+    const xs = geojson.geometry.coordinates[0].map(([x, y]) => x);
+    const ys = geojson.geometry.coordinates[0].map(([x, y]) => y);
+
+    geojson.bbox = [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)];
+
+    return geojson;
   }
 
   asObj() {
