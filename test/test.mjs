@@ -54,7 +54,8 @@ const AS_OBJ_RESULT = {
   center_str: { x: "-25.5", y: "13.5" },
   str: "-72,-47,21,74",
   wkt: "POLYGON((21 -47,21 74,-72 74,-72 -47,21 -47))",
-  ewkt: "SRID=4326;POLYGON((21 -47,21 74,-72 74,-72 -47,21 -47))"
+  ewkt: "SRID=4326;POLYGON((21 -47,21 74,-72 74,-72 -47,21 -47))",
+  js: `new GeoExtent([-72, -47, 21, 74], { srs: "EPSG:4326" })`
 };
 // console.log(AS_OBJ_RESULT);
 
@@ -106,6 +107,7 @@ test("create from points", ({ eq }) => {
     bbox_str: ["147", "-18", "147", "-18"],
     center: { x: 147, y: -18 },
     center_str: { x: "147", y: "-18" },
+    js: `new GeoExtent([147, -18, 147, -18], { srs: "EPSG:4326" })`,
     str: "147,-18,147,-18",
     wkt: "POLYGON((147 -18,147 -18,147 -18,147 -18,147 -18))",
     ewkt: "SRID=4326;POLYGON((147 -18,147 -18,147 -18,147 -18,147 -18))"
