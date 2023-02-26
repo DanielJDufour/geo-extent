@@ -8,6 +8,10 @@ import add from "preciso/add.js";
 import divide from "preciso/divide.js";
 import multiply from "preciso/multiply.js";
 import subtract from "preciso/subtract.js";
+
+import booleanIntersects from "bbox-fns/boolean-intersects.js";
+import polygon from "bbox-fns/polygon.js";
+
 import getEPSGCode from "get-epsg-code";
 import reprojectBoundingBox from "reproject-bbox";
 import reprojectGeoJSON from "reproject-geojson";
@@ -33,6 +37,7 @@ const isStr = o => typeof o === "string";
 const isNum = o => typeof o === "number";
 const isBoxStr = o => isStr(o) && !!o.match(/^[-|+]?[\d\.]+(, ?[-|+]?[\d\.]+){3}$/);
 const isLeafletLatLngBounds = o => isObj(o) && hasFuncs(o, ["getEast", "getNorth", "getSouth", "getWest"]);
+const isLeafletLatLngBoundsJSON = o => isObj(o) && hasKeys(o, ["_southWest", "_northEast"]);
 const wkt = bbox => {
   const [xmin, ymin, xmax, ymax] = bbox;
   return `POLYGON((${xmax} ${ymin},${xmax} ${ymax},${xmin} ${ymax},${xmin} ${ymin},${xmax} ${ymin}))`;
@@ -107,6 +112,12 @@ export class GeoExtent {
       [[ymin, xmin], [ymax, xmax]] = o;
     } else if (isLeafletLatLngBounds(o)) {
       (xmin = o.getWest()), (xmax = o.getEast()), (ymin = o.getSouth()), (ymax = o.getNorth());
+      if (!isDef(this.srs)) this.srs = "EPSG:4326";
+    } else if (isLeafletLatLngBoundsJSON(o)) {
+      ({
+        _southWest: { lat: ymin, lng: xmin },
+        _northEast: { lat: ymax, lng: xmax }
+      } = o);
       if (!isDef(this.srs)) this.srs = "EPSG:4326";
     } else if (isAry(o) && o.length === 2 && o.every(it => hasKeys(it, ["x", "y"]))) {
       [{ x: xmin, y: ymin }, { x: xmax, y: ymax }] = o;
@@ -205,6 +216,8 @@ export class GeoExtent {
     this.wkt = wkt(this.bbox_str);
 
     this.ewkt = (this.srs?.startsWith("EPSG:") ? this.srs.replace("EPSG:", "SRID=") + ";" : "") + this.wkt;
+
+    this.js = `new GeoExtent([${this.bbox_str.join(", ")}]${this.srs ? `, { srs: ${JSON.stringify(this.srs)} }` : ""})`;
   }
 
   _pre(_this, _other) {
@@ -247,7 +260,7 @@ export class GeoExtent {
     other = new this.constructor(other);
 
     // if really no overlap then return null
-    if (this.overlaps(other, { quiet: true }) === false && other.overlaps(this, { quiet: true }) === false) {
+    if (!this.overlaps(other)) {
       return null;
     }
 
@@ -336,18 +349,44 @@ export class GeoExtent {
     Or at least make the user have to be explicit about the functionality via
     a flag like overlaps(geojson, { strict: false })
   */
-  overlaps(other, { quiet = false } = { quite: false }) {
+  _overlaps(other, { quiet = false } = { quiet: false }) {
     try {
       const [_this, _other] = this._pre(this, other);
 
-      const yOverlaps = _other.ymin <= _this.ymax && _other.ymax >= _this.ymin;
-      const xOverlaps = _other.xmin <= _this.xmax && _other.xmax >= _this.xmin;
-
-      return xOverlaps && yOverlaps;
+      return booleanIntersects(_this.bbox, _other.bbox);
     } catch (error) {
       if (quiet) return;
       else throw error;
     }
+  }
+
+  overlaps(other, { quiet = true, strict = false } = { quiet: true, strict: false }) {
+    if (this._overlaps(other, { quiet })) {
+      return true;
+    }
+
+    if (strict) return false;
+
+    // if already in same projection or none at all,
+    // don't bother trying different projections
+    if (this.srs === other.srs || (!this.srs && !other.srs)) {
+      return false;
+    }
+
+    // if not strict, try finding overlap in reverse and 4326
+    other = new this.constructor(other);
+    if (other._overlaps(this, { quiet: true })) {
+      return true;
+    }
+
+    // check 4326
+    if (this.srs && other.srs) {
+      if (this.reproj(4326)._overlaps(other.reproj(4326))) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   reproj(to, { quiet = false } = { quiet: false }) {
@@ -438,21 +477,12 @@ export class GeoExtent {
   }
 
   asGeoJSON() {
-    const { xmin, ymin, xmax, ymax } = this;
     let geojson = {
       type: "Feature",
       properties: {},
       geometry: {
         type: "Polygon",
-        coordinates: [
-          [
-            [xmin, ymax],
-            [xmin, ymin],
-            [xmax, ymin],
-            [xmax, ymax],
-            [xmin, ymax]
-          ]
-        ]
+        coordinates: polygon(this.bbox)
       }
     };
     if (![undefined, null, "EPSG:4326"].includes(this.srs)) {
