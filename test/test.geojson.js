@@ -47,6 +47,19 @@ test("asGeoJSON", ({ eq }) => {
   });
 });
 
+test("creating GeoJSON from extent in different projection", ({ eq }) => {
+  const bbox = [-2316545, -1971615, 1015455, 1512385];
+  const srs = 6623;
+  const extent = new GeoExtent(bbox, { srs });
+  const geojson = extent.asGeoJSON({ density: 0 });
+  eq(geojson.geometry.coordinates[0].length, 5);
+  eq(geojson.bbox, [-104.15783650020958, 22.33428366410961, -51.769705847928805, 56.48158793780131]);
+
+  const denseGeoJSON = extent.asGeoJSON({ density: 10 });
+  eq(denseGeoJSON.geometry.coordinates[0].length, 5 + 4 * 10);
+  eq(geojson.bbox, [-104.15783650020958, 22.33428366410961, -51.769705847928805, 57.52407399197629]);
+});
+
 /*
 test("creating extent from GeoJSON point", ({ eq }) => {
   // from https://geojson.org/

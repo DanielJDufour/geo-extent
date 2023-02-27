@@ -54,3 +54,11 @@ extent.asGeoJSON();
   }
 }
 ```
+
+## density
+You can add more points along the edges of the bounding box in order
+to get a more accurate reprojected GeoJSON
+```js
+// will add 10 points on each side of the bounding box
+extent.asGeoJSON({ density: 10 });
+```

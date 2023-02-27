@@ -476,16 +476,52 @@ export class GeoExtent {
     };
   }
 
-  asGeoJSON() {
+  asGeoJSON({ density = 0 } = { density: 0 }) {
+    const will_reproject = ![undefined, null, "EPSG:4326"].includes(this.srs);
+
+    const ring = [];
+
+    // left-side, bottom-side, right-side, top-side
+    const x_distance = this.width / (density + 1);
+    const y_distance = this.height / (density + 1);
+
+    // add top left corner
+    ring.push([this.xmin, this.ymax]);
+
+    // left-edge
+    for (let i = 1; i <= density; i++) ring.push([this.xmin, this.ymax - i * y_distance]);
+
+    // add bottom left corner
+    ring.push([this.xmin, this.ymin]);
+
+    // bottom-edge
+    for (let i = 1; i <= density; i++) ring.push([this.xmin + i * x_distance, this.ymin]);
+
+    // add bottom right corner
+    ring.push([this.xmax, this.ymin]);
+
+    // right-edge
+    for (let i = 1; i <= density; i++) ring.push([this.xmax, this.ymin + i * y_distance]);
+
+    // add top right corner
+    ring.push([this.xmax, this.ymax]);
+
+    // top-edge
+    for (let i = 1; i <= density; i++) ring.push([this.xmax - i * x_distance, this.ymax]);
+
+    // add top left corner (repeats according to GeoJSON spec)
+    ring.push([this.xmin, this.ymax]);
+
     let geojson = {
       type: "Feature",
       properties: {},
       geometry: {
         type: "Polygon",
-        coordinates: polygon(this.bbox)
+        coordinates: [ring]
       }
     };
-    if (![undefined, null, "EPSG:4326"].includes(this.srs)) {
+
+    if (will_reproject) {
       geojson = reprojectGeoJSON(geojson, { from: this.srs, to: "EPSG:4326", in_place: true });
     }
 
