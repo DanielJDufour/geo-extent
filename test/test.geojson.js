@@ -57,7 +57,7 @@ test("creating GeoJSON from extent in different projection", ({ eq }) => {
 
   const denseGeoJSON = extent.asGeoJSON({ density: 10 });
   eq(denseGeoJSON.geometry.coordinates[0].length, 5 + 4 * 10);
-  eq(geojson.bbox, [-104.15783650020958, 22.33428366410961, -51.769705847928805, 57.52407399197629]);
+  eq(denseGeoJSON.bbox, [-104.15783650020958, 22.33428366410961, -51.769705847928805, 57.52407399197629]);
 });
 
 /*

@@ -9,8 +9,9 @@ import divide from "preciso/divide.js";
 import multiply from "preciso/multiply.js";
 import subtract from "preciso/subtract.js";
 
+import bboxArray from "bbox-fns/bbox-array.js";
 import booleanIntersects from "bbox-fns/boolean-intersects.js";
-import polygon from "bbox-fns/polygon.js";
+import densePolygon from "bbox-fns/dense-polygon.js";
 
 import getEPSGCode from "get-epsg-code";
 import reprojectBoundingBox from "reproject-bbox";
@@ -389,7 +390,7 @@ export class GeoExtent {
     return false;
   }
 
-  reproj(to, { quiet = false } = { quiet: false }) {
+  reproj(to, { accuracy = "high", quiet = false } = { accuracy: "high", quiet: false }) {
     to = normalize(to); // normalize srs
 
     // don't need to reproject, so just return a clone
@@ -413,10 +414,19 @@ export class GeoExtent {
       }
     }
 
+    let density;
+    if (accuracy === "low") density = 0;
+    else if (accuracy === "medium") density = 10;
+    else if (accuracy === "high") density = 100;
+    else if (accuracy === "higher") density = 1000;
+    else if (accuracy === "highest") density = 10000;
+    else if (typeof accuracy === "number") density = accuracy;
+
     let reprojected;
     try {
       reprojected = reprojectBoundingBox({
         bbox: this.bbox,
+        density,
         from: this.srs,
         to
       });
@@ -479,45 +489,12 @@ export class GeoExtent {
   asGeoJSON({ density = 0 } = { density: 0 }) {
     const will_reproject = ![undefined, null, "EPSG:4326"].includes(this.srs);
 
-    const ring = [];
-
-    // left-side, bottom-side, right-side, top-side
-    const x_distance = this.width / (density + 1);
-    const y_distance = this.height / (density + 1);
-
-    // add top left corner
-    ring.push([this.xmin, this.ymax]);
-
-    // left-edge
-    for (let i = 1; i <= density; i++) ring.push([this.xmin, this.ymax - i * y_distance]);
-
-    // add bottom left corner
-    ring.push([this.xmin, this.ymin]);
-
-    // bottom-edge
-    for (let i = 1; i <= density; i++) ring.push([this.xmin + i * x_distance, this.ymin]);
-
-    // add bottom right corner
-    ring.push([this.xmax, this.ymin]);
-
-    // right-edge
-    for (let i = 1; i <= density; i++) ring.push([this.xmax, this.ymin + i * y_distance]);
-
-    // add top right corner
-    ring.push([this.xmax, this.ymax]);
-
-    // top-edge
-    for (let i = 1; i <= density; i++) ring.push([this.xmax - i * x_distance, this.ymax]);
-
-    // add top left corner (repeats according to GeoJSON spec)
-    ring.push([this.xmin, this.ymax]);
-
     let geojson = {
       type: "Feature",
       properties: {},
       geometry: {
         type: "Polygon",
-        coordinates: [ring]
+        coordinates: densePolygon(this.bbox, { density })
       }
     };
 
@@ -525,10 +502,7 @@ export class GeoExtent {
       geojson = reprojectGeoJSON(geojson, { from: this.srs, to: "EPSG:4326", in_place: true });
     }
 
-    const xs = geojson.geometry.coordinates[0].map(([x, y]) => x);
-    const ys = geojson.geometry.coordinates[0].map(([x, y]) => y);
-
-    geojson.bbox = [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)];
+    geojson.bbox = bboxArray(geojson.geometry.coordinates[0]);
 
     return geojson;
   }

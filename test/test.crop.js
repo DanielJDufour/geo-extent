@@ -55,5 +55,5 @@ test("crop world tile", ({ eq }) => {
   const cutline = new GeoExtent([205437, 3268524, 230448, 3280290], { srs: "EPSG:32615" });
 
   const cropped = extentOfTileInMapCRS.crop(cutline);
-  console.log({ cropped });
+  // console.log({ cropped });
 });

@@ -67,3 +67,39 @@ test("reproject from code to same wkt", ({ eq }) => {
   const new_bbox = new GeoExtent(old_bbox, { srs: wkt }).reproj(3857).bbox;
   eq(old_bbox, new_bbox);
 });
+
+test("reproject extent that bends out", ({ eq }) => {
+  const bbox = [-2316545, -1971615, 1015455, 1512385];
+  const srs = 6623;
+  const extent = new GeoExtent(bbox, { srs });
+  eq(extent.reproj(4326, { accuracy: "low" }).bbox, [
+    -104.15783650020958,
+    22.33428366410961,
+    -51.769705847928805,
+    56.48158793780131
+  ]);
+  eq(extent.reproj(4326, { accuracy: "medium" }).bbox, [
+    -104.15783650020958,
+    22.33428366410961,
+    -51.769705847928805,
+    57.52407399197629
+  ]);
+  eq(extent.reproj(4326, { accuracy: "high" }).bbox, [
+    -104.15783650020958,
+    22.33428366410961,
+    -51.769705847928805,
+    57.53583071204875
+  ]);
+  eq(extent.reproj(4326, { accuracy: "higher" }).bbox, [
+    -104.15783650020958,
+    22.33428366410961,
+    -51.769705847928805,
+    57.53588499736936
+  ]);
+  eq(extent.reproj(4326, { accuracy: "highest" }).bbox, [
+    -104.15783650020958,
+    22.33428366410961,
+    -51.769705847928805,
+    57.535885041786784
+  ]);
+});
