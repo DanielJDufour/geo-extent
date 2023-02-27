@@ -390,7 +390,7 @@ export class GeoExtent {
     return false;
   }
 
-  reproj(to, { accuracy = "high", quiet = false } = { accuracy: "high", quiet: false }) {
+  reproj(to, { density = "high", quiet = false } = { density: "high", quiet: false }) {
     to = normalize(to); // normalize srs
 
     // don't need to reproject, so just return a clone
@@ -414,13 +414,12 @@ export class GeoExtent {
       }
     }
 
-    let density;
-    if (accuracy === "low") density = 0;
-    else if (accuracy === "medium") density = 10;
-    else if (accuracy === "high") density = 100;
-    else if (accuracy === "higher") density = 1000;
-    else if (accuracy === "highest") density = 10000;
-    else if (typeof accuracy === "number") density = accuracy;
+    if (density === "lowest") density = 0;
+    else if (density === "low") density = 1;
+    else if (density === "medium") density = 10;
+    else if (density === "high") density = 100;
+    else if (density === "higher") density = 1000;
+    else if (density === "highest") density = 10000;
 
     let reprojected;
     try {

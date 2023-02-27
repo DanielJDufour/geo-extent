@@ -72,31 +72,37 @@ test("reproject extent that bends out", ({ eq }) => {
   const bbox = [-2316545, -1971615, 1015455, 1512385];
   const srs = 6623;
   const extent = new GeoExtent(bbox, { srs });
-  eq(extent.reproj(4326, { accuracy: "low" }).bbox, [
+  eq(extent.reproj(4326, { density: "lowest" }).bbox, [
     -104.15783650020958,
     22.33428366410961,
     -51.769705847928805,
     56.48158793780131
   ]);
-  eq(extent.reproj(4326, { accuracy: "medium" }).bbox, [
+  eq(extent.reproj(4326, { density: "low" }).bbox, [
+    -104.15783650020958,
+    22.33428366410961,
+    -51.769705847928805,
+    57.099578714450445
+  ]);
+  eq(extent.reproj(4326, { density: "medium" }).bbox, [
     -104.15783650020958,
     22.33428366410961,
     -51.769705847928805,
     57.52407399197629
   ]);
-  eq(extent.reproj(4326, { accuracy: "high" }).bbox, [
+  eq(extent.reproj(4326, { density: "high" }).bbox, [
     -104.15783650020958,
     22.33428366410961,
     -51.769705847928805,
     57.53583071204875
   ]);
-  eq(extent.reproj(4326, { accuracy: "higher" }).bbox, [
+  eq(extent.reproj(4326, { density: "higher" }).bbox, [
     -104.15783650020958,
     22.33428366410961,
     -51.769705847928805,
     57.53588499736936
   ]);
-  eq(extent.reproj(4326, { accuracy: "highest" }).bbox, [
+  eq(extent.reproj(4326, { density: "highest" }).bbox, [
     -104.15783650020958,
     22.33428366410961,
     -51.769705847928805,

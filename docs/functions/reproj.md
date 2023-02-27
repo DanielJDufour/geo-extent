@@ -19,18 +19,19 @@ northPole.reproj(3857, { quiet: true });
 // undefined
 ```
 
-# accuracy
-You can control the accuracy of the reprojection.  Sometimes a bounding box will bend when reprojected
-and the most extreme points won't necessarily be at the corners.
+# density
+You can control the accuracy of the reprojection by passing in a point density parameter.
+Sometimes a bounding box will bend when reprojected and the most extreme points won't necessarily be at the corners.  If you care for speed more than accuracy, you should choose a lower value.
+By default, reproj uses a "high" density adding a 100 points to each side before reprojecting.
 ```js
 extent.reproj(4326, {
-  // choose between "low", "medium", "high", "higher", or "highest"
-  accuracy: "highest"
+  // choose between "lowest", "low", "medium", "high", "higher", or "highest"
+  density: "high"
 });
 
 extent.reproj(4326, {
-  // you can specify the number of points to add to each side,
+  // you can also directly specify the number of points to add to each side,
   // which is passed to https://github.com/danieljdufour/bbox-fns#densepolygon
-  accuracy: [100, 125]
+  density: [100, 125]
 });
 ```
