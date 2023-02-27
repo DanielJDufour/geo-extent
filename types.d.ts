@@ -39,6 +39,6 @@ export class GeoExtent {
   crop(other: GeoExtent): GeoExtent;
   equals: (other: GeoExtent, options?: { digits?: number }) => boolean;
   overlaps(other: GeoExtent): boolean;
-  reproj: ((srs: number, options?: { accuracy?: 'low' | 'medium' | 'high' | 'higher' | 'highest' | number | undefined, quiet: false }) => GeoExtent) | ((srs: number, options: { accuracy?: 'low' | 'medium' | 'high' | 'higher' | 'highest' | number | undefined, quiet: true }) => (GeoExtent | undefined));
+  reproj: ((srs: number, options?: { density?: 'lowest' | 'low' | 'medium' | 'high' | 'higher' | 'highest' | number | undefined, quiet: false }) => GeoExtent) | ((srs: number, options: { density?: 'lowest' | 'low' | 'medium' | 'high' | 'higher' | 'highest' | number | undefined, quiet: true }) => (GeoExtent | undefined));
   unwrap(): GeoExtent[];
 }
