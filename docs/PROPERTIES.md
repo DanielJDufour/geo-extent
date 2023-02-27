@@ -32,3 +32,4 @@ Once you've created a GeoExtent, you will have access to the following propertie
 | leafletBounds | [<br/>&nbsp;&nbsp;[-47, -72],<br/>&nbsp;&nbsp;[74, 21]<br/>] | An array of two corners in form accepted by LeafletJS, which is [ [ymin, xmin], [ymax, xmax] ] |
 | wkt | "POLYGON((21 -47,21 74,-72 74,-72 -47,21 -47))" | [OGC Well-Known Text Polygon](https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry) |
 | ewkt | "SRID=4326;POLYGON((21 -47,21 74,-72 74,-72 -47,21 -47))" | [Extended WKT Polygon](https://postgis.net/docs/ST_AsEWKT.html) used by PostGIS (includes SRID) |
+| js | 'new GeoExtent([-72, -47, 21, 74], { srs: "EPSG:4326" })' | JavaScript code to create the extent |
