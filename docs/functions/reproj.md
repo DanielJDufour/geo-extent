@@ -18,3 +18,19 @@ northPole.reproj(3857);
 northPole.reproj(3857, { quiet: true });
 // undefined
 ```
+
+# accuracy
+You can control the accuracy of the reprojection.  Sometimes a bounding box will bend when reprojected
+and the most extreme points won't necessarily be at the corners.
+```js
+extent.reproj(4326, {
+  // choose between "low", "medium", "high", "higher", or "highest"
+  accuracy: "highest"
+});
+
+extent.reproj(4326, {
+  // you can specify the number of points to add to each side,
+  // which is passed to https://github.com/danieljdufour/bbox-fns#densepolygon
+  accuracy: [100, 125]
+});
+```
