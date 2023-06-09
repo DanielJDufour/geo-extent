@@ -21,3 +21,11 @@ test("precise bbox string", ({ eq }) => {
   const ext = new GeoExtent("0,10.487811882056695,0.351562500000006,10.833305983642477");
   eq(ext.width, 0.351562500000006);
 });
+
+// see https://github.com/DanielJDufour/geo-extent/issues/9
+test("infinity", ({ eq }) => {
+  const ext = new GeoExtent([166021.4430805326, 0, Infinity, Infinity], { srs: "EPSG:26916" });
+  eq(ext.area, Infinity);
+  eq(ext.width, Infinity);
+  eq(ext.center, { x: Infinity, y: Infinity });
+});

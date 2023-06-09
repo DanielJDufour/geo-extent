@@ -62,7 +62,7 @@
   "dependencies": {
     "bbox-fns": "^0.3.0",
     "get-epsg-code": "^0.1.0",
-    "preciso": "^0.10.0",
+    "preciso": "^0.12.0",
     "reproject-bbox": "^0.6.0",
     "reproject-geojson": "^0.3.0"
   }
