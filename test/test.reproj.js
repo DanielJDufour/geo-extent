@@ -109,3 +109,26 @@ test("reproject extent that bends out", ({ eq }) => {
     57.535885041786784
   ]);
 });
+
+test("reproj to inf", ({ eq }) => {
+  const bbox = [-10018754.171394622, -7.081154551613622e-10, 0, 10018754.171394624];
+  const srs = "EPSG:3857";
+
+  let msg;
+  try {
+    new GeoExtent(bbox, { srs }).reproj(26916, { debug: false, density: 100 });
+  } catch (error) {
+    msg = error.message;
+  }
+  eq(
+    msg,
+    "[geo-extent] failed to reproject -10018754.171394622,-7.081154551613622e-10,0,10018754.171394624 from EPSG:3857 to EPSG:26916"
+  );
+
+  eq(new GeoExtent(bbox, { srs }).reproj(26916, { allow_infinity: true }).bbox, [
+    166021.4430805326,
+    -187729840.1254552,
+    Infinity,
+    Infinity
+  ]);
+});

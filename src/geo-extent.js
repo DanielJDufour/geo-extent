@@ -10,6 +10,7 @@ import multiply from "preciso/multiply.js";
 import subtract from "preciso/subtract.js";
 
 import bboxArray from "bbox-fns/bbox-array.js";
+import booleanContains from "bbox-fns/boolean-contains.js";
 import booleanIntersects from "bbox-fns/boolean-intersects.js";
 import densePolygon from "bbox-fns/dense-polygon.js";
 
@@ -247,13 +248,45 @@ export class GeoExtent {
     return new this.constructor(this);
   }
 
-  contains(other) {
-    const [_this, _other] = this._pre(this, other);
+  _contains(other, { quiet = false } = { quiet: false }) {
+    try {
+      const [_this, _other] = this._pre(this, other);
 
-    const xContains = _other.xmin >= _this.xmin && _other.xmax <= _this.xmax;
-    const yContains = _other.ymin >= _this.ymin && _other.ymax <= _this.ymax;
+      return booleanContains(_this.bbox, _other.bbox);
+    } catch (error) {
+      if (!quiet) throw error;
+    }
+  }
 
-    return xContains && yContains;
+  contains(other, { debug_level = 0, quiet = true } = { debug_level: 0, quiet: true }) {
+    const result = this._contains(other, { quiet: true });
+    if (typeof result === "boolean") return result;
+
+    if (isDef(this.srs) && isDef(other.srs)) {
+      try {
+        // try reprojecting to projection of second bbox
+        const this2 = this.reproj(other.srs);
+        const result2 = this2._contains(other, { quiet: true });
+        if (typeof result2 === "boolean") return result2;
+      } catch (error) {
+        if (debug_level >= 1) console.error(error);
+      }
+
+      try {
+        // previous attempt was inconclusive, so try again by converting everything to 4326
+        const this4326 = this.reproj(4326);
+        const other4326 = other.reproj(4326);
+        const result4326 = this4326._contains(other4326, { quiet: true });
+        if (typeof result4326 === "boolean") return result4326;
+      } catch (error) {
+        if (debug_level >= 1) console.error(error);
+      }
+    }
+
+    if (!quiet)
+      throw new Error(
+        `[geo-extent] failed to determine if ${this.bbox} in srs ${this.srs} contains ${other.bbox} in srs ${other.srs}`
+      );
   }
 
   // should return null if no overlap
@@ -390,7 +423,15 @@ export class GeoExtent {
     return false;
   }
 
-  reproj(to, { density = "high", quiet = false } = { density: "high", quiet: false }) {
+  reproj(
+    to,
+    { allow_infinity = false, debug_level = 0, density = "high", quiet = false } = {
+      allow_infinity: false,
+      debug_level: 0,
+      density: "high",
+      quiet: false
+    }
+  ) {
     to = normalize(to); // normalize srs
 
     // don't need to reproject, so just return a clone
@@ -430,15 +471,47 @@ export class GeoExtent {
         to
       });
     } catch (error) {
-      if (quiet) return;
-      throw new Error(`[geo-extent] failed to reproject ${this.bbox} from ${this.srs} to ${to}`);
+      if (debug_level) console.error(error);
     }
 
-    if (reprojected.some(isNaN)) {
-      if (quiet) return;
+    if (reprojected?.every(isFinite)) {
+      return new GeoExtent(reprojected, { srs: to });
+    }
+    // as a fallback, try reprojecting to EPSG:4326 then to the desired srs
+    if (to !== 4326) {
+      let bbox_4326;
+      try {
+        bbox_4326 = reprojectBoundingBox({
+          bbox: this.bbox,
+          density,
+          from: this.srs,
+          to: 4326
+        });
+      } catch (error) {
+        if (debug_level) console.error("failed to create intermediary bbox in EPSG:4326");
+      }
+
+      if (bbox_4326) {
+        try {
+          reprojected = reprojectBoundingBox({
+            bbox: bbox_4326,
+            density,
+            from: 4326,
+            to
+          });
+        } catch (err) {
+          if (debug_level) console.error(`failed to reproject from intermediary bbox ${bbox_4326} in 4326 to ${to}`);
+        }
+      }
+    }
+
+    if (allow_infinity || reprojected?.every(isFinite)) {
+      return new GeoExtent(reprojected, { srs: to });
+    } else if (quiet) {
+      return;
+    } else {
       throw new Error(`[geo-extent] failed to reproject ${this.bbox} from ${this.srs} to ${to}`);
     }
-    return new GeoExtent(reprojected, { srs: to });
   }
 
   unwrap() {
