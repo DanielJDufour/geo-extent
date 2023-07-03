@@ -56,6 +56,7 @@ const allStrs = ary => isAry(ary) && ary.every(isStr);
 const getConstructor = o => (typeof obj === "object" && typeof obj.constructor === "function") || undefined;
 const normalize = srs => {
   if (!srs) return srs;
+  if (srs === 32767 || srs === "EPSG:32767") return null;
   if (isStr(srs) && srs.startsWith("EPSG:")) return srs;
   if (isStr(srs) && srs.match(/^\d+$/)) return "EPSG:" + srs;
   else if (isNum(srs)) return "EPSG:" + srs;

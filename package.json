@@ -4,8 +4,8 @@
   "description": "Simple, Modern Geospatial Bounding Boxes",
   "main": "dist/geo-extent.cjs",
   "module": "dist/geo-extent.mjs",
-  "unpkg": "dist/geo-extent.browserify.js",
-  "jsdelivr": "dist/geo-extent.browserify.js",
+  "unpkg": "dist/geo-extent.bundle.js",
+  "jsdelivr": "dist/geo-extent.bundle.js",
   "type": "module",
   "types": "./types.d.ts",
   "files": [
@@ -13,11 +13,13 @@
     "src/geo-extent.js",
     "dist/geo-extent.cjs",
     "dist/geo-extent.mjs",
-    "dist/geo-extent.browserify.js"
+    "dist/geo-extent.bundle.js"
   ],
   "scripts": {
-    "build": "cp ./src/geo-extent.js ./dist/geo-extent.mjs && npx babel ./src/geo-extent.js --out-file ./dist/geo-extent.cjs --plugins=@babel/plugin-transform-modules-commonjs",
-    "browserify": "npx browserify ./dist/geo-extent.cjs > ./dist/geo-extent.browserify.js",
+    "build": "npm run build:mjs && npm run build:cjs && npm run build:bundle",
+    "build:mjs": "cp ./src/geo-extent.js ./dist/geo-extent.mjs",
+    "build:cjs": "npx babel ./src/geo-extent.js --out-file ./dist/geo-extent.cjs --plugins=@babel/plugin-transform-modules-commonjs",
+    "build:bundle": "esbuild ./dist/geo-extent.cjs --bundle --outfile=./dist/geo-extent.bundle.js",
     "f": "npm run format",
     "format": "npx prettier --arrow-parens=avoid --print-width=120 --trailing-comma=none --write *.ts src/*.js test/*.js test/*.mjs",
     "prepublishOnly": "npm run format && npm run build && npm run browserify && npm run test",
@@ -54,16 +56,17 @@
     "@babel/helper-compilation-targets": "^7.22.5",
     "@babel/helper-validator-option": "^7.22.5",
     "@babel/plugin-transform-modules-commonjs": "^7.22.5",
+    "esbuild": "^0.18.11",
     "flug": "^2.6.0",
     "global-jsdom": "^9.0.1",
     "jsdom": "^22.1.0",
     "leaflet": "^1.9.4"
   },
   "dependencies": {
-    "bbox-fns": "^0.11.0",
-    "get-epsg-code": "^0.1.0",
+    "bbox-fns": "^0.13.0",
+    "get-epsg-code": "1.0.0",
     "preciso": "^0.12.0",
-    "reproject-bbox": "^0.10.0",
+    "reproject-bbox": "^0.12.0",
     "reproject-geojson": "^0.3.0"
   }
 }

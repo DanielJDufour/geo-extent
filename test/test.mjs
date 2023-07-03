@@ -198,3 +198,9 @@ test("cropping web mercator tile", ({ eq }) => {
 
   eq(partial.bbox, [-10605790.548624776, 3358990.12945602, -10601914.152717294, 3365675.2294528796]);
 });
+
+test("32767 unknown", ({ eq }) => {
+  const bbox = [7698736.857788673, 163239.83797837654, 10066450.245949663, 1325082.6679127468];
+  const extent = new GeoExtent(bbox, { srs: "EPSG:32767" });
+  eq(extent.srs, null);
+});
