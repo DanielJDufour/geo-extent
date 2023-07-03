@@ -22,7 +22,7 @@
     "build:bundle": "esbuild ./dist/geo-extent.cjs --bundle --outfile=./dist/geo-extent.bundle.js",
     "f": "npm run format",
     "format": "npx prettier --arrow-parens=avoid --print-width=120 --trailing-comma=none --write *.ts src/*.js test/*.js test/*.mjs",
-    "prepublishOnly": "npm run format && npm run build && npm run browserify && npm run test",
+    "prepublishOnly": "npm run format && npm run build && npm run test",
     "test": "for f in ./test/*; do echo \"node $f\" && node $f && echo \"npx ts-node $f\" && npx ts-node $f; done"
   },
   "repository": {
