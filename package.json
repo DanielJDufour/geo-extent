@@ -51,13 +51,14 @@
   },
   "homepage": "https://github.com/DanielJDufour/geo-extent#readme",
   "devDependencies": {
-    "@babel/cli": "^7.22.5",
-    "@babel/core": "^7.22.5",
-    "@babel/helper-compilation-targets": "^7.22.5",
+    "@babel/cli": "^7.22.6",
+    "@babel/core": "^7.22.6",
+    "@babel/helper-compilation-targets": "^7.22.6",
     "@babel/helper-validator-option": "^7.22.5",
     "@babel/plugin-transform-modules-commonjs": "^7.22.5",
     "esbuild": "^0.18.11",
     "flug": "^2.6.0",
+    "geography-markup-language": "^0.0.1",
     "global-jsdom": "^9.0.1",
     "jsdom": "^22.1.0",
     "leaflet": "^1.9.4"

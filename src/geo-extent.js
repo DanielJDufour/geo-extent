@@ -15,6 +15,7 @@ import booleanIntersects from "bbox-fns/boolean-intersects.js";
 import densePolygon from "bbox-fns/dense-polygon.js";
 
 import getEPSGCode from "get-epsg-code";
+import { Envelope } from "geography-markup-language";
 import reprojectBoundingBox from "reproject-bbox";
 import reprojectGeoJSON from "reproject-geojson";
 
@@ -169,6 +170,19 @@ export class GeoExtent {
       ({ lat: ymin, lng: xmin } = o._bounds._southWest);
       ({ lat: ymax, lng: xmax } = o._bounds._northEast);
       if (!isDef(this.srs)) this.srs = "EPSG:4326";
+    } else if (isStr(o) && o.toLowerCase().includes("envelope")) {
+      const envelope = Envelope(o);
+      if (envelope.corners) {
+        [[xmin, ymin], [xmax, ymax]] = envelope.corners;
+      }
+      if (envelope.srs) {
+        if (envelope.srs.startsWith("urn") && envelope.srs.includes("EPSG:")) {
+          // ex: "urn:ogc:def:crs:EPSG:9.0:26986"
+          this.srs = "EPSG:" + envelope.srs.split(":").pop();
+        } else if (/^EPSG:\d+/.test(envelope.srs)) {
+          this.srs = envelope.srs;
+        }
+      }
     } else {
       throw new Error("[geo-extent] unknown format");
     }

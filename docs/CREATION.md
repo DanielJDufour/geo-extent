@@ -101,3 +101,13 @@ import Point from 'ol/geom/Point';
 const pointFromOpenLayers = new Point([longitude, latitude);
 new GeoExtent(pointFromOpenLayers, { srs: 4326 } )
 ```
+
+## Creating from Geography Markup Language Envelope
+```js
+new GeoExtent(`
+  <gml:Envelope srsDimension="2" srsName="urn:ogc:def:crs:EPSG:9.0:4326">
+    <gml:lowerCorner>42.943 -71.032</gml:lowerCorner>
+     <gml:upperCorner>43.039 -69.856</gml:upperCorner>
+  </gml:Envelope>
+`);
+```
