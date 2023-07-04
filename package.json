@@ -17,13 +17,15 @@
   ],
   "scripts": {
     "build": "npm run build:mjs && npm run build:cjs && npm run build:bundle",
+    "build:bundle": "esbuild ./src/geo-extent.js --bundle --outfile=./dist/geo-extent.bundle.js --platform=browser",
     "build:mjs": "cp ./src/geo-extent.js ./dist/geo-extent.mjs",
-    "build:cjs": "npx babel ./src/geo-extent.js --out-file ./dist/geo-extent.cjs --plugins=@babel/plugin-transform-modules-commonjs",
-    "build:bundle": "esbuild ./dist/geo-extent.cjs --bundle --outfile=./dist/geo-extent.bundle.js",
+    "build:cjs": "esbuild ./src/geo-extent.js --bundle --outfile=./dist/geo-extent.cjs --platform=node",
     "f": "npm run format",
     "format": "npx prettier --arrow-parens=avoid --print-width=120 --trailing-comma=none --write *.ts src/*.js test/*.js test/*.mjs",
     "prepublishOnly": "npm run format && npm run build && npm run test",
-    "test": "for f in ./test/*; do echo \"node $f\" && node $f && echo \"npx ts-node $f\" && npx ts-node $f; done"
+    "test": "npm run test:js && npm run test:dist",
+    "test:js": "for f in ./test/*; do echo \"node $f\" && node $f && echo \"npx ts-node $f\" && npx ts-node $f; done",
+    "test:dist": "node ./dist/geo-extent.cjs"
   },
   "repository": {
     "type": "git",
