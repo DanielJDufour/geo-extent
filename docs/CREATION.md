@@ -103,6 +103,7 @@ new GeoExtent(pointFromOpenLayers, { srs: 4326 } )
 ```
 
 ## Creating from Geography Markup Language Envelope
+This uses [geography-markup-language](https://github.com/DanielJDufour/geography-markup-language).
 ```js
 new GeoExtent(`
   <gml:Envelope srsDimension="2" srsName="urn:ogc:def:crs:EPSG:9.0:4326">
