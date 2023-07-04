@@ -60,13 +60,13 @@
     "@babel/plugin-transform-modules-commonjs": "^7.22.5",
     "esbuild": "^0.18.11",
     "flug": "^2.6.0",
-    "geography-markup-language": "^0.0.1",
     "global-jsdom": "^9.0.1",
     "jsdom": "^22.1.0",
     "leaflet": "^1.9.4"
   },
   "dependencies": {
     "bbox-fns": "^0.13.0",
+    "geography-markup-language": "^0.2.0",
     "get-epsg-code": "1.0.0",
     "preciso": "^0.12.0",
     "reproject-bbox": "^0.12.0",
