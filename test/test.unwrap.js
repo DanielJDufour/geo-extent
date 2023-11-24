@@ -34,8 +34,8 @@ test("unwrap example", ({ eq }) => {
   const extent = new GeoExtent([-230, 19, -155, 45], { srs: 4326 });
   const unwrapped = extent.unwrap().map(ext => ext.bbox);
   eq(unwrapped, [
-    [130, 19, 180, 45],
-    [-180, 19, -155, 45]
+    [-180, 19, -155, 45],
+    [130, 19, 180, 45]
   ]);
 });
 
