@@ -18,8 +18,8 @@ test("unwrap right overflow", ({ eq }) => {
   const extent = new GeoExtent([175, -85, 185, 90], { srs: 4326 });
   const unwrapped = extent.unwrap().map(ext => ext.bbox);
   eq(unwrapped, [
-    [175, -85, 180, 90],
-    [-180, -85, -175, 90]
+    [-180, -85, -175, 90],
+    [175, -85, 180, 90]
   ]);
 });
 

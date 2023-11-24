@@ -13,6 +13,7 @@ import bboxArray from "bbox-fns/bbox-array.js";
 import booleanContains from "bbox-fns/boolean-contains.js";
 import booleanIntersects from "bbox-fns/boolean-intersects.js";
 import densePolygon from "bbox-fns/dense-polygon.js";
+import unwrap from "bbox-fns/unwrap.js";
 
 import getEPSGCode from "get-epsg-code";
 import { Envelope } from "geography-markup-language";
@@ -538,27 +539,9 @@ export class GeoExtent {
     // extent is within the normal extent of the earth, so return clone
     if (xmin > -180 && xmax < 180) return [this.clone()];
 
-    // handle special case where extent overflows xmin and then overlaps itself
-    if (xmin < -180 && xmax >= xmin + 360) return [new this.constructor([-180, ymin, 180, ymax], { srs: 4326 })];
+    const bboxes = unwrap(this.bbox, [-180, -90, 180, 90]);
 
-    if (xmax > 180 && xmin <= xmax - 360) return [new this.constructor([-180, ymin, 180, ymax], { srs: 4326 })];
-
-    let extents = [];
-
-    // extent overflows left edge of the world
-    if (xmin < -180) {
-      extents.push(new this.constructor([xmin + 360, ymin, 180, ymax], { srs }));
-    }
-
-    // add extent for part between -180 to 180 longitude
-    extents.push(new this.constructor([xmin < -180 ? -180 : xmin, ymin, xmax > 180 ? 180 : xmax, ymax], { srs }));
-
-    // extent overflows right edge of the world
-    if (this.xmax > 180) {
-      extents.push(new this.constructor([-180, ymin, xmax - 360, ymax], { srs }));
-    }
-
-    return extents;
+    return bboxes.map(bbox => new this.constructor(bbox, { srs: 4326 }));
   }
 
   asEsriJSON() {

@@ -65,7 +65,7 @@
     "leaflet": "^1.9.4"
   },
   "dependencies": {
-    "bbox-fns": "^0.13.0",
+    "bbox-fns": "^0.19.0",
     "geography-markup-language": "^0.2.0",
     "get-epsg-code": "1.1.0",
     "preciso": "^0.12.0",
