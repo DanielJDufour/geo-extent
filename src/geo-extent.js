@@ -40,6 +40,16 @@ const isObj = o => typeof o === "object";
 const isStr = o => typeof o === "string";
 const isNum = o => typeof o === "number";
 const isBoxStr = o => isStr(o) && !!o.match(/^[-|+]?[\d\.]+(, ?[-|+]?[\d\.]+){3}$/);
+const isLeafletBounds = it =>
+  isObj(it) && hasFuncs(it, ["getBottomLeft", "getBottomRight", "getTopLeft", "getTopRight"]);
+const isLeafletBoundsJSON = it =>
+  isObj(it) &&
+  typeof it.min === "object" &&
+  typeof it.min.x === "number" &&
+  typeof it.min.y === "number" &&
+  typeof it.max === "object" &&
+  typeof it.max.x === "number" &&
+  typeof it.max.y === "number";
 const isLeafletLatLngBounds = o => isObj(o) && hasFuncs(o, ["getEast", "getNorth", "getSouth", "getWest"]);
 const isLeafletLatLngBoundsJSON = o => isObj(o) && hasKeys(o, ["_southWest", "_northEast"]);
 const wkt = bbox => {
@@ -118,12 +128,19 @@ export class GeoExtent {
     } else if (isLeafletLatLngBounds(o)) {
       (xmin = o.getWest()), (xmax = o.getEast()), (ymin = o.getSouth()), (ymax = o.getNorth());
       if (!isDef(this.srs)) this.srs = "EPSG:4326";
+    } else if (isLeafletBounds(o)) {
+      ({ x: xmin, y: ymin } = o.getBottomLeft()), ({ x: xmax, y: ymax } = o.getTopRight());
     } else if (isLeafletLatLngBoundsJSON(o)) {
       ({
         _southWest: { lat: ymin, lng: xmin },
         _northEast: { lat: ymax, lng: xmax }
       } = o);
       if (!isDef(this.srs)) this.srs = "EPSG:4326";
+    } else if (isLeafletBoundsJSON(o)) {
+      ({
+        min: { x: xmin, y: ymin },
+        max: { x: xmax, y: ymax }
+      } = o);
     } else if (isAry(o) && o.length === 2 && o.every(it => hasKeys(it, ["x", "y"]))) {
       [{ x: xmin, y: ymin }, { x: xmax, y: ymax }] = o;
     } else if (isObj(o) && hasKeys(o, ["x", "y"]) && isNum(o.x) && isNum(o.y)) {

@@ -1,6 +1,7 @@
 import test from "flug";
 import "global-jsdom/register";
-import Leaflet from "leaflet";
+import "./fix-leaflet.js";
+import L from "leaflet";
 import { GeoExtent } from "../src/geo-extent.js";
 
 test("Leaflet's bounds", ({ eq }) => {
@@ -12,11 +13,21 @@ test("Leaflet's bounds", ({ eq }) => {
     [ymin, xmin],
     [ymax, xmax]
   ];
-  const rect = Leaflet.rectangle(bounds);
+  const rect = L.rectangle(bounds);
   const extent = new GeoExtent(rect);
 
   // false because bounds is not srs-aware
   eq(extent.equals(bounds), false);
 
+  eq(extent.equals(bounds, { strict: false }), true);
+});
+
+test("L.bounds", ({ eq }) => {
+  const bounds = L.bounds([
+    [2409321.727264079, -965489.1535151823],
+    [2577147.829325225, -835571.8532756742]
+  ]);
+  const extent = new GeoExtent(bounds);
+  eq(extent.equals(bounds), false);
   eq(extent.equals(bounds, { strict: false }), true);
 });
