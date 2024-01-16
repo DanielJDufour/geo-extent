@@ -46,6 +46,8 @@ export class GeoExtent {
           allow_infinity?: boolean | undefined;
           density?: "lowest" | "low" | "medium" | "high" | "higher" | "highest" | number | undefined;
           debug_level?: number | undefined;
+          shrink?: boolean | undefined;
+          shrink_density?: number | undefined;
           quiet: false;
         }
       ) => GeoExtent)
@@ -55,6 +57,8 @@ export class GeoExtent {
           allow_infinity?: boolean;
           debug_level?: number | undefined;
           density?: "lowest" | "low" | "medium" | "high" | "higher" | "highest" | number | undefined;
+          shrink?: boolean | undefined;
+          shrink_density?: number | undefined;
           quiet: true;
         }
       ) => GeoExtent | undefined);
