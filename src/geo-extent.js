@@ -458,10 +458,20 @@ export class GeoExtent {
 
   reproj(
     to,
-    { allow_infinity = false, debug_level = 0, density = "high", quiet = false } = {
+    {
+      allow_infinity = false,
+      debug_level = 0,
+      density = "high",
+      shrink = false,
+      shrink_density = 100,
+      split = true,
+      quiet = false
+    } = {
       allow_infinity: false,
       debug_level: 0,
       density: "high",
+      shrink: false,
+      split: true,
       quiet: false
     }
   ) {
@@ -497,12 +507,14 @@ export class GeoExtent {
 
     let reprojected;
     try {
-      reprojected = reprojectBoundingBox({
+      const options = {
         bbox: this.bbox,
         density,
         from: this.srs,
+        split,
         to
-      });
+      };
+      reprojected = reprojectBoundingBox(options);
     } catch (error) {
       if (debug_level) console.error(error);
     }
@@ -510,6 +522,7 @@ export class GeoExtent {
     if (reprojected?.every(isFinite)) {
       return new GeoExtent(reprojected, { srs: to });
     }
+
     // as a fallback, try reprojecting to EPSG:4326 then to the desired srs
     if (to !== 4326) {
       let bbox_4326;
@@ -518,6 +531,7 @@ export class GeoExtent {
           bbox: this.bbox,
           density,
           from: this.srs,
+          split,
           to: 4326
         });
       } catch (error) {
@@ -530,6 +544,7 @@ export class GeoExtent {
             bbox: bbox_4326,
             density,
             from: 4326,
+            split,
             to
           });
         } catch (err) {
@@ -538,7 +553,36 @@ export class GeoExtent {
       }
     }
 
-    if (allow_infinity || reprojected?.every(isFinite)) {
+    if (reprojected && (allow_infinity || reprojected?.every(isFinite))) {
+      return new GeoExtent(reprojected, { srs: to });
+    }
+
+    // if really haven't gotten a solution yet,
+    // such as when reprojecting globe into Web Mercator
+    // reproject with shrinking and highest density
+    if (shrink) {
+      try {
+        if (shrink_density === "lowest") shrink_density = 1;
+        else if (shrink_density === "low") shrink_density = 2;
+        else if (shrink_density === "medium") shrink_density = 10;
+        else if (shrink_density === "high") shrink_density = 100;
+        else if (shrink_density === "higher") shrink_density = 1000;
+        else if (shrink_density === "highest") shrink_density = 10000;
+
+        reprojected = reprojectBoundingBox({
+          bbox: this.bbox,
+          density: shrink_density,
+          from: this.srs,
+          nan_strategy: "skip",
+          split: true,
+          to
+        });
+      } catch (err) {
+        if (debug_level) console.error(`failed to reproject from bbox ${this.bbox} with shrinking to ${to}`);
+      }
+    }
+
+    if (reprojected && (allow_infinity || reprojected?.every(isFinite))) {
       return new GeoExtent(reprojected, { srs: to });
     } else if (quiet) {
       return;

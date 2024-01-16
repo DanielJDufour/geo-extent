@@ -44,3 +44,12 @@ extent.reproj(4326, {
   density: [100, 125]
 });
 ```
+
+## shrinking
+Sometimes reprojecting a bounding box extends pass the valid bounds of the new projection, leading to NaN values.  You can effectively shrink the bounding box, so it fits into the new projection's bounds, by pasing `shrink: true` and a `shrink_density` number.  This works by essentially densifying the edges and disregarding points on the edges reprojected as NaN values.
+```js
+const northPole = new GeoExtent([-180, 85, 180, 90], { srs: 4326 });
+
+northPole.reproj(3857, { shrink: true, shrink_density: 100 }).bbox;
+[-20037508.342789244, 19971868.880408563, 20037508.342789244, 49411788.9015311]
+```
